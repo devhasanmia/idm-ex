@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .status-card {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .status-dot.offline {
+      background: #ef4444;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 8px;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+    }
+    .btn-secondary {
+      background: #334155;
+      color: #f8fafc;
+    }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">⚡</div>
+    <div>
+      <div style="font-weight: bold; font-size: 15px;">IDM-RS Extension</div>
+      <div style="font-size: 11px; color: #94a3b8;">Turbo Download Accelerator</div>
+    </div>
+  </div>
+
+  <div class="status-card">
+    <span id="daemonStatus"><span class="status-dot"></span> Checking engine...</span>
+    <span style="color: #60a5fa; font-size: 11px;">Port 8080</span>
+  </div>
+
+  <input type="text" id="urlInput" placeholder="Paste download URL here">
+  <button class="btn btn-primary" id="startBtn">⚡ Accelerated Download</button>
+  <button class="btn btn-secondary" id="dashBtn">Open Dashboard Web UI</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>
+

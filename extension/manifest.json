@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "IDM-RS Turbo Download Integration",
+  "version": "1.0.0",
+  "description": "Accelerate and capture browser downloads directly with IDM-RS Turbo Engine",
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8080/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "IDM-RS Turbo Downloader"
+  }
+}
+

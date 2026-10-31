@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDM-RS Turbo Download Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(18, 24, 38, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --sidebar-width: 240px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
+    }
+
+    /* Sidebar */
+    aside {
+      width: var(--sidebar-width);
+      background: rgba(13, 18, 30, 0.95);
+      border-right: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 8px 24px 8px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 20px;
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #fff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-badge {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .nav-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.8px;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+    .nav-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: rgba(59, 130, 246, 0.12);
+      color: #fff;
+    }
+    .nav-item.active {
+      border-left: 3px solid var(--primary);
+      font-weight: 600;
+    }
+    .nav-count {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 12px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--card-border);
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .engine-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--success);
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    /* Main Content */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 24px 32px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--card-border);
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Stats Banner */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+    }
+    .stat-sub {
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    /* Speed Graph */
+    .speed-graph-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .graph-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .graph-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #speedCanvas {
+      width: 100%;
+      height: 70px;
+      display: block;
+    }
+
+    /* Downloads Table */
+    .table-container {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow-y: auto;
+      backdrop-filter: blur(8px);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+    th {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 12px 16px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.6px;
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+    }
+    tr:hover {
+      background: rgba(59, 130, 246, 0.04);
+    }
+
+    .file-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+    }
+    .file-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .file-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .file-url {
+      font-size: 11px;
+      color: var(--text-muted);
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Progress bar */
+    .progress-bar-wrap {
+      width: 100%;
+      min-width: 160px;
+      background: rgba(255, 255, 255, 0.08);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      transition: width 0.3s ease;
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+    }
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .badge-downloading {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+    .badge-completed {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .badge-paused {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .badge-failed {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: var(--text);
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      margin-right: 4px;
+    }
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    /* Segment Visualizer Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal {
+      background: #111827;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 680px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .form-input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* IDM Connection Matrix Bar */
+    .matrix-bar {
+      display: flex;
+      gap: 2px;
+      height: 28px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 6px;
+      padding: 3px;
+      margin: 16px 0;
+      border: 1px solid var(--card-border);
+    }
+    .matrix-segment {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .matrix-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      transition: width 0.2s ease;
+    }
+
+    .empty-state {
+      padding: 48px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-title">IDM-RS</div>
+        <div class="brand-badge">TURBO v1.0</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Categories</div>
+    <ul class="nav-menu">
+      <li class="nav-item active" onclick="filterCategory('all')">
+        <span>⚡ All Downloads</span>
+        <span class="nav-count" id="count-all">0</span>
+      </li>
+      <li class="nav-item" onclick="filterCategory('downloading')">
+        <span>⏳ Downloading</span>
+        <span class="nav-count" id="count-active">0</span>
+      </li>
+      <li class="nav-item" onclick="filterCategory('completed')">
+        <span>✅ Completed</span>
+        <span class="nav-count" id="count-completed">0</span>
+      </li>
+      <li class="nav-item" onclick="filterCategory('compressed')">
+        <span>📦 Compressed (ZIP/RAR)</span>
+      </li>
+      <li class="nav-item" onclick="filterCategory('video')">
+        <span>🎬 Video & Audio</span>
+      </li>
+      <li class="nav-item" onclick="filterCategory('programs')">
+        <span>💾 Programs (EXE/ISO)</span>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="engine-status">
+        <span class="status-dot"></span>
+        <span>Rust Tokio Engine Active</span>
+      </div>
+      <div>Dynamic Segmentation: 16/32 Threads</div>
+      <div>Zero-Merge Direct I/O Enabled</div>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <main>
+    <header>
+      <div>
+        <h1 style="font-size: 24px; font-weight: 800;">Downloads Dashboard</h1>
+        <p style="font-size: 13px; color: var(--text-muted);">High-performance multi-part accelerated download manager</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="openExtensionModal()">🧩 Browser Extension</button>
+        <button class="btn btn-primary" onclick="openAddModal()">+ Add New Download</button>
+      </div>
+    </header>
+
+    <!-- Top Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Bandwidth</div>
+        <div class="stat-value" id="totalSpeed">0 KB/s</div>
+        <div class="stat-sub">Dynamic Segment Sum</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active Connections</div>
+        <div class="stat-value" id="activeConnections">0</div>
+        <div class="stat-sub">Multiplexed Streams</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active Downloads</div>
+        <div class="stat-value" id="activeTasksCount">0</div>
+        <div class="stat-sub">In queue & streaming</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completed Files</div>
+        <div class="stat-value" id="completedTasksCount">0</div>
+        <div class="stat-sub">Ready in output dir</div>
+      </div>
+    </div>
+
+    <!-- Live Speed Canvas -->
+    <div class="speed-graph-card">
+      <div class="graph-header">
+        <div class="graph-title">
+          <span>📈 Real-Time Speed Monitor</span>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);" id="peakSpeed">Peak: 0 KB/s</div>
+      </div>
+      <canvas id="speedCanvas" height="70"></canvas>
+    </div>
+
+    <!-- Downloads Table -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>File Name</th>
+            <th>Size</th>
+            <th>Progress & Status</th>
+            <th>Speed</th>
+            <th>ETA</th>
+            <th>Threads</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tasksTableBody">
+          <!-- Dynamic tasks rendered here -->
+        </tbody>
+      </table>
+      <div class="empty-state" id="emptyState">
+        <h3>No active downloads</h3>
+        <p style="margin-top: 8px;">Click <b>"+ Add New Download"</b> or send a link from your browser to begin!</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Download Modal -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">⚡ Add New Download</div>
+        <button class="close-btn" onclick="closeAddModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Download URL</label>
+        <input type="text" class="form-input" id="downloadUrl" placeholder="Paste YouTube video or any file URL..." autofocus oninput="onUrlInput()">
+      </div>
+      <!-- Video Preview & Quality Selector -->
+      <div id="videoPreviewWrap" style="display: none; background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 16px;">
+        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+          <img id="videoThumb" src="" style="width: 80px; height: 48px; object-fit: cover; border-radius: 6px; display: none;">
+          <div>
+            <div id="videoTitlePreview" style="font-weight: 700; font-size: 13px; color: #fff; line-height: 1.4;"></div>
+            <div id="videoMetaPreview" style="font-size: 11px; color: var(--accent); margin-top: 2px;"></div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" style="color: #67e8f9;">🎬 Select Video Quality / Format</label>
+          <select class="form-input" id="videoQualitySelect" style="border-color: #06b6d4; background: #0f172a;">
+            <option value="1080p">⚡ 1080p Full HD (Video + Audio)</option>
+            <option value="720p">🎬 720p HD (Video + Audio)</option>
+            <option value="360p">📱 360p SD (Video + Audio)</option>
+            <option value="audio">🎵 Audio Only (128kbps AAC M4A)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Custom Filename (Optional)</label>
+        <input type="text" class="form-input" id="customFilename" placeholder="Auto-detect from server">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Max Connections</label>
+          <select class="form-input" id="connectionsCount">
+            <option value="8">8 Threads</option>
+            <option value="16" selected>16 Threads (IDM Turbo)</option>
+            <option value="32">32 Threads (Extreme Bandwidth)</option>
+            <option value="4">4 Threads (Gentle)</option>
+            <option value="1">1 Thread (Sequential)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Speed Limit</label>
+          <select class="form-input" id="speedLimit">
+            <option value="0" selected>Unlimited</option>
+            <option value="1048576">1 MB/s</option>
+            <option value="5242880">5 MB/s</option>
+            <option value="10485760">10 MB/s</option>
+          </select>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+        <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitDownload()">Start Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Segment Inspector Modal (The IDM Connection Matrix) -->
+  <div class="modal-overlay" id="matrixModal">
+    <div class="modal" style="max-width: 780px;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="matrixFilename">File Segments</div>
+          <div style="font-size: 12px; color: var(--text-muted);" id="matrixDetails">IDM Dynamic Reallocation Status</div>
+        </div>
+        <button class="close-btn" onclick="closeMatrixModal()">&times;</button>
+      </div>
+
+      <div class="matrix-bar" id="matrixSegmentsBar">
+        <!-- Dynamic colored segments rendered here -->
+      </div>
+
+      <div style="max-height: 260px; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Part #</th>
+              <th>Range (Bytes)</th>
+              <th>Downloaded</th>
+              <th>Progress</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="matrixTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button class="btn btn-secondary" onclick="closeMatrixModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Browser Extension Modal -->
+  <div class="modal-overlay" id="extensionModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">🧩 Browser Extension & Integration</div>
+        <button class="close-btn" onclick="closeExtensionModal()">&times;</button>
+      </div>
+      <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted); margin-bottom: 16px;">
+        IDM-RS includes a native Chrome / Edge / Brave / Firefox integration extension located in:
+        <br><code style="color: #60a5fa; font-family: 'JetBrains Mono', monospace;">C:\idm-rs\extension</code>
+      </p>
+      <div style="background: rgba(255, 255, 255, 0.04); padding: 14px; border-radius: 8px; border: 1px solid var(--card-border); font-size: 13px; margin-bottom: 16px;">
+        <b>How to install:</b><br>
+        1. Open Chrome/Edge and go to <code style="color: #93c5fd;">chrome://extensions</code><br>
+        2. Enable <b>Developer Mode</b> (toggle in top right).<br>
+        3. Click <b>"Load unpacked"</b> and select folder <code style="color: #93c5fd;">C:\idm-rs\extension</code>.<br>
+        4. Any file you download or right-click in your browser is automatically accelerated by IDM-RS!
+      </div>
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary" onclick="closeExtensionModal()">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let tasks = [];
+    let speedHistory = new Array(60).fill(0);
+    let peakSpeedVal = 0;
+    let selectedTaskId = null;
+    let currentFilter = 'all';
+
+    // Format bytes
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function formatSpeed(bps) {
+      return formatBytes(bps) + '/s';
+    }
+
+    function formatEta(seconds) {
+      if (!seconds || seconds <= 0 || seconds > 86400 * 30) return '--';
+      if (seconds < 60) return seconds + 's';
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      if (m < 60) return `${m}m ${s}s`;
+      const h = Math.floor(m / 60);
+      return `${h}h ${m % 60}m`;
+    }
+
+    // Canvas Speed Graph
+    const canvas = document.getElementById('speedCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function drawSpeedGraph() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+
+      ctx.clearRect(0, 0, w, h);
+      const maxVal = Math.max(...speedHistory, 1024 * 1024); // at least 1MB/s scale
+
+      ctx.beginPath();
+      const step = w / (speedHistory.length - 1);
+      for (let i = 0; i < speedHistory.length; i++) {
+        const x = i * step;
+        const y = h - (speedHistory[i] / maxVal) * (h - 8) - 4;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.strokeStyle = '#06b6d4';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Area fill gradient
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, 'rgba(6, 182, 212, 0.25)');
+      grad.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    // WebSocket connection
+    function connectWs() {
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${location.host}/api/ws`;
+      const ws = new WebSocket(wsUrl);
+
+      ws.onmessage = (event) => {
+        try {
+          tasks = JSON.parse(event.data);
+          updateUI();
+        } catch (e) {
+          console.error('Error parsing WS message:', e);
+        }
+      };
+
+      ws.onclose = () => {
+        setTimeout(connectWs, 2000);
+      };
+    }
+
+    function updateUI() {
+      let totalSpeed = 0;
+      let activeConns = 0;
+      let activeCount = 0;
+      let completedCount = 0;
+
+      tasks.forEach(t => {
+        if (t.status === 'Downloading') {
+          totalSpeed += t.speed_bps;
+          activeConns += t.connections;
+          activeCount++;
+        } else if (t.status === 'Completed') {
+          completedCount++;
+        }
+      });
+
+      document.getElementById('totalSpeed').innerText = formatSpeed(totalSpeed);
+      document.getElementById('activeConnections').innerText = activeConns;
+      document.getElementById('activeTasksCount').innerText = activeCount;
+      document.getElementById('completedTasksCount').innerText = completedCount;
+      document.getElementById('count-all').innerText = tasks.length;
+      document.getElementById('count-active').innerText = activeCount;
+      document.getElementById('count-completed').innerText = completedCount;
+
+      // Update graph
+      speedHistory.push(totalSpeed);
+      speedHistory.shift();
+      if (totalSpeed > peakSpeedVal) {
+        peakSpeedVal = totalSpeed;
+        document.getElementById('peakSpeed').innerText = `Peak: ${formatSpeed(peakSpeedVal)}`;
+      }
+      drawSpeedGraph();
+
+      // Render tasks table
+      renderTable();
+
+      // Update matrix modal if open
+      if (selectedTaskId) {
+        const task = tasks.find(t => t.id === selectedTaskId);
+        if (task) renderMatrixModal(task);
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tasksTableBody');
+      const empty = document.getElementById('emptyState');
+
+      let filtered = tasks;
+      if (currentFilter === 'downloading') {
+        filtered = tasks.filter(t => t.status === 'Downloading');
+      } else if (currentFilter === 'completed') {
+        filtered = tasks.filter(t => t.status === 'Completed');
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      tbody.innerHTML = filtered.map(t => {
+        let badgeClass = 'badge-downloading';
+        let statusText = t.status;
+        if (t.status === 'Completed') badgeClass = 'badge-completed';
+        else if (t.status === 'Paused') badgeClass = 'badge-paused';
+        else if (t.status === 'Failed') badgeClass = 'badge-failed';
+        else if (t.status === 'Muxing') {
+          badgeClass = 'badge-downloading';
+          statusText = '⚡ Muxing Audio & Video...';
+        }
+
+        const qualityBadge = t.quality ? `<span class="badge" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9; margin-left: 6px; font-size: 10px;">${t.quality}</span>` : '';
+
+        return `
+          <tr>
+            <td>
+              <div class="file-cell" onclick="inspectMatrix('${t.id}')">
+                <div class="file-icon">📁</div>
+                <div class="file-info">
+                  <div>${t.file_name} ${qualityBadge}</div>
+                  <div class="file-url">${t.url}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-family: 'JetBrains Mono', monospace;">
+                ${formatBytes(t.downloaded_bytes)} / ${t.total_size > 0 ? formatBytes(t.total_size) : 'Unknown'}
+              </div>
+            </td>
+            <td style="min-width: 180px;">
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" style="width: ${t.progress_percent}%;"></div>
+              </div>
+              <div class="progress-stats">
+                <span>${t.progress_percent.toFixed(1)}%</span>
+                <span class="badge ${badgeClass}">${statusText}</span>
+              </div>
+            </td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #67e8f9;">
+              ${t.status === 'Downloading' ? formatSpeed(t.speed_bps) : '--'}
+            </td>
+            <td style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">
+              ${t.status === 'Downloading' ? formatEta(t.eta_seconds) : '--'}
+            </td>
+            <td>
+              <span class="badge" style="background: rgba(255,255,255,0.06);">${t.connections} threads</span>
+            </td>
+            <td>
+              ${t.status === 'Downloading' ? 
+                `<button class="action-btn" title="Pause" onclick="pauseTask('${t.id}')">⏸️</button>` : 
+                (t.status === 'Paused' || t.status === 'Failed' ? 
+                `<button class="action-btn" title="Resume" onclick="resumeTask('${t.id}')">▶️</button>` : '')
+              }
+              <button class="action-btn" title="Cancel/Delete" onclick="cancelTask('${t.id}')">🗑️</button>
+              <button class="action-btn" title="Inspect Dynamic Chunks" onclick="inspectMatrix('${t.id}')">🔍</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Task actions
+    async function pauseTask(id) {
+      await fetch(`/api/tasks/${id}/pause`, { method: 'POST' });
+    }
+
+    async function resumeTask(id) {
+      await fetch(`/api/tasks/${id}/resume`, { method: 'POST' });
+    }
+
+    async function cancelTask(id) {
+      if (confirm('Delete this download?')) {
+        await fetch(`/api/tasks/${id}/cancel`, { method: 'POST' });
+      }
+    }
+
+    function filterCategory(cat) {
+      currentFilter = cat;
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      renderTable();
+    }
+
+    // Modal controls
+    function openAddModal() {
+      document.getElementById('addModal').style.display = 'flex';
+      document.getElementById('downloadUrl').focus();
+    }
+    function closeAddModal() {
+      document.getElementById('addModal').style.display = 'none';
+    }
+
+    function openExtensionModal() {
+      document.getElementById('extensionModal').style.display = 'flex';
+    }
+    function closeExtensionModal() {
+      document.getElementById('extensionModal').style.display = 'none';
+    }
+
+    let probeTimeout = null;
+    async function onUrlInput() {
+      const url = document.getElementById('downloadUrl').value.trim();
+      const wrap = document.getElementById('videoPreviewWrap');
+      if (!url || url.length < 10) {
+        wrap.style.display = 'none';
+        return;
+      }
+
+      clearTimeout(probeTimeout);
+      probeTimeout = setTimeout(async () => {
+        try {
+          const res = await fetch('/api/probe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+          });
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data.isVideo && data.qualities && data.qualities.length > 0) {
+            wrap.style.display = 'block';
+            document.getElementById('videoTitlePreview').innerText = data.title || '';
+            document.getElementById('videoMetaPreview').innerText = 
+              (data.author ? data.author + ' • ' : '') + (data.duration ? data.duration : '');
+
+            const thumb = document.getElementById('videoThumb');
+            if (data.thumbnail) {
+              thumb.src = data.thumbnail;
+              thumb.style.display = 'block';
+            } else {
+              thumb.style.display = 'none';
+            }
+
+            const sel = document.getElementById('videoQualitySelect');
+            sel.innerHTML = data.qualities.map(q => 
+              `<option value="${q.id}">${q.label} (${q.sizeFormatted})</option>`
+            ).join('');
+          } else {
+            wrap.style.display = 'none';
+          }
+        } catch (e) {
+          wrap.style.display = 'none';
+        }
+      }, 350);
+    }
+
+    async function submitDownload() {
+      const url = document.getElementById('downloadUrl').value.trim();
+      if (!url) return alert('Please enter a valid URL');
+
+      const customName = document.getElementById('customFilename').value.trim() || undefined;
+      const connections = parseInt(document.getElementById('connectionsCount').value, 10);
+      const speedLimit = parseInt(document.getElementById('speedLimit').value, 10);
+      const qualityEl = document.getElementById('videoQualitySelect');
+      const quality = (document.getElementById('videoPreviewWrap').style.display !== 'none' && qualityEl)
+        ? qualityEl.value
+        : undefined;
+
+      await fetch('/api/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url,
+          filename: customName,
+          quality,
+          connections,
+          speed_limit: speedLimit
+        })
+      });
+
+      document.getElementById('downloadUrl').value = '';
+      document.getElementById('customFilename').value = '';
+      document.getElementById('videoPreviewWrap').style.display = 'none';
+      closeAddModal();
+    }
+
+    // Matrix modal
+    function inspectMatrix(id) {
+      selectedTaskId = id;
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        renderMatrixModal(task);
+        document.getElementById('matrixModal').style.display = 'flex';
+      }
+    }
+
+    function closeMatrixModal() {
+      selectedTaskId = null;
+      document.getElementById('matrixModal').style.display = 'none';
+    }
+
+    function renderMatrixModal(task) {
+      document.getElementById('matrixFilename').innerText = task.file_name;
+      document.getElementById('matrixDetails').innerText = 
+        `${task.segments.length} Dynamic Chunks | ${formatBytes(task.downloaded_bytes)} of ${formatBytes(task.total_size)} (${task.progress_percent.toFixed(1)}%)`;
+
+      const bar = document.getElementById('matrixSegmentsBar');
+      bar.innerHTML = task.segments.map(s => {
+        const total = (s.end_byte - s.start_byte + 1) || 1;
+        const pct = Math.min(100, (s.downloaded_bytes / total) * 100);
+        return `
+          <div class="matrix-segment" title="Part ${s.id}: ${pct.toFixed(1)}%">
+            <div class="matrix-fill" style="width: ${pct}%;"></div>
+          </div>
+        `;
+      }).join('');
+
+      const tbody = document.getElementById('matrixTableBody');
+      tbody.innerHTML = task.segments.map(s => {
+        const total = (s.end_byte - s.start_byte + 1) || 0;
+        const pct = total > 0 ? ((s.downloaded_bytes / total) * 100).toFixed(1) : 0;
+        return `
+          <tr>
+            <td>Part #${s.id + 1}</td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">${s.start_byte} - ${s.end_byte}</td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">${formatBytes(s.downloaded_bytes)}</td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">${pct}%</td>
+            <td><span class="badge ${s.status === 'Completed' ? 'badge-completed' : 'badge-downloading'}">${s.status}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.onload = () => {
+      connectWs();
+    };
+  </script>
+</body>
+</html>
+
