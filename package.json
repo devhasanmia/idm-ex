@@ -10,6 +10,7 @@
   "scripts": {
     "start": "node idm.js",
     "serve": "node idm.js serve",
+    "build": "node build-exe.js",
     "help": "node idm.js --help"
   },
   "author": "Downly Team",

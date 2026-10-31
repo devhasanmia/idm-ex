@@ -1192,6 +1192,12 @@
           <input type="text" class="search-input" id="searchInput" placeholder="Search downloads..." oninput="renderTable()">
         </div>
 
+        <button class="icon-btn" onclick="openDownloadsFolder()" title="Open Downloads Folder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+          </svg>
+        </button>
+
         <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Switch Light / Dark Mode">
           <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
@@ -1436,7 +1442,11 @@
         3. Click <strong>Load unpacked</strong> and select the <code style="color: var(--primary);">extension</code> folder.<br>
         4. Enjoy one-click floating video downloads & right-click acceleration!
       </div>
-      <div style="display: flex; justify-content: flex-end;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+        <button class="btn btn-secondary" onclick="openExtensionFolder()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+          <span>Open Extension Folder</span>
+        </button>
         <button class="btn btn-primary" onclick="closeExtensionModal()">Done</button>
       </div>
     </div>
@@ -1587,24 +1597,31 @@
       ctx.fill();
     }
 
-    // WebSocket Live State
-    function connectWs() {
-      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${location.host}/api/ws`;
-      const ws = new WebSocket(wsUrl);
-
-      ws.onmessage = (event) => {
-        try {
-          tasks = JSON.parse(event.data);
+    // Live State Sync (HTTP Polling + WebSocket)
+    async function fetchTasks() {
+      try {
+        const res = await fetch('/api/tasks');
+        if (res.ok) {
+          tasks = await res.json();
           updateUI();
-        } catch (e) {
-          console.error('Error parsing WS message:', e);
         }
-      };
+      } catch (e) {}
+    }
 
-      ws.onclose = () => {
-        setTimeout(connectWs, 2000);
-      };
+    function connectWs() {
+      fetchTasks();
+      setInterval(fetchTasks, 400);
+      try {
+        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${location.host}/api/ws`;
+        const ws = new WebSocket(wsUrl);
+        ws.onmessage = (event) => {
+          try {
+            tasks = JSON.parse(event.data);
+            updateUI();
+          } catch (e) {}
+        };
+      } catch (e) {}
     }
 
     function updateUI() {
@@ -1614,7 +1631,7 @@
       let completedCount = 0;
 
       tasks.forEach(t => {
-        if (t.status === 'Downloading' || t.status === 'Muxing') {
+        if (t.status === 'Downloading' || t.status === 'Muxing' || t.status === 'Connecting' || t.status === 'Queued') {
           totalSpeed += t.speed_bps || 0;
           activeConns += t.connections || 0;
           activeCount++;
@@ -1654,7 +1671,7 @@
       let filtered = tasks.slice().reverse();
 
       if (currentFilter === 'downloading') {
-        filtered = filtered.filter(t => t.status === 'Downloading' || t.status === 'Muxing');
+        filtered = filtered.filter(t => t.status === 'Downloading' || t.status === 'Muxing' || t.status === 'Connecting' || t.status === 'Queued');
       } else if (currentFilter === 'completed') {
         filtered = filtered.filter(t => t.status === 'Completed');
       } else if (['video', 'compressed', 'programs'].includes(currentFilter)) {
@@ -1712,6 +1729,7 @@
                   <span class="file-size-mono">${sizeInfo}</span>
                   <span>•</span>
                   <span>${t.connections} threads</span>
+                  ${t.error ? `<span style="color: var(--danger); font-weight: 500;">• ${t.error}</span>` : ''}
                 </div>
               </div>
             </div>
@@ -1741,6 +1759,9 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
                 </button>
               ` : '')}
+              <button class="action-btn" title="Show in Folder" onclick="openTaskFolder('${t.id}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+              </button>
               <button class="action-btn" title="Inspect Segments" onclick="inspectMatrix('${t.id}')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
               </button>
@@ -1756,17 +1777,36 @@
     // Task Actions
     async function pauseTask(id) {
       await fetch(`/api/tasks/${id}/pause`, { method: 'POST' });
+      await fetchTasks();
       showToast('Download paused');
     }
 
     async function resumeTask(id) {
       await fetch(`/api/tasks/${id}/resume`, { method: 'POST' });
+      await fetchTasks();
       showToast('Download resumed');
     }
 
     async function cancelTask(id) {
       await fetch(`/api/tasks/${id}/cancel`, { method: 'POST' });
+      await fetchTasks();
       showToast('Download removed');
+    }
+
+    async function openTaskFolder(id) {
+      await fetch(`/api/tasks/${id}/open-folder`, { method: 'POST' });
+      showToast('Opened file location in Explorer');
+    }
+
+    async function openDownloadsFolder() {
+      await fetch('/api/open-downloads', { method: 'POST' });
+      showToast('Opened Downloads folder');
+    }
+
+    async function openExtensionFolder() {
+      const res = await fetch('/api/open-extension', { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      showToast(data.path ? `Opened: ${data.path}` : 'Opened Extension folder');
     }
 
     function filterCategory(cat, el) {
@@ -1902,6 +1942,7 @@
       document.getElementById('videoPreviewWrap').style.display = 'none';
       document.getElementById('audioLanguageWrap').style.display = 'none';
       closeAddModal();
+      await fetchTasks();
       showToast('Download added to Downly queue');
     }
 

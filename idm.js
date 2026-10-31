@@ -15,7 +15,9 @@ const url = require('node:url');
 const crypto = require('node:crypto');
 const os = require('node:os');
 const { spawn } = require('node:child_process');
-const ffmpegPath = require('ffmpeg-static');
+let ffmpegStaticPath = null;
+try { ffmpegStaticPath = require('ffmpeg-static'); } catch (e) {}
+const embeddedAssets = require('./embedded_assets');
 const { Ytdl } = require('@distube/ytdl-core');
 
 const PORT = 8080;
@@ -70,33 +72,85 @@ function formatDuration(seconds) {
 // FFmpeg Video + Audio Remuxer (Lossless Video Copy + Stereo AAC Audio)
 // -----------------------------------------------------------------------------
 
+function resolveFfmpegBinary() {
+  const exeDir = path.dirname(process.execPath);
+  const candidates = [
+    path.join(exeDir, 'ffmpeg.exe'),
+    path.join(exeDir, 'node_modules', 'ffmpeg-static', 'ffmpeg.exe'),
+    path.join(process.cwd(), 'node_modules', 'ffmpeg-static', 'ffmpeg.exe'),
+    path.join(process.env.LOCALAPPDATA || os.homedir(), 'Downly', 'ffmpeg.exe')
+  ];
+  if (ffmpegStaticPath && !ffmpegStaticPath.startsWith('B:') && !ffmpegStaticPath.startsWith('b:')) {
+    candidates.push(ffmpegStaticPath);
+  }
+  for (const c of candidates) {
+    try {
+      if (c && fs.existsSync(c)) return c;
+    } catch (e) {}
+  }
+  return null;
+}
+
 function mergeVideoAndAudio(videoPath, audioPath, outputPath) {
   return new Promise((resolve, reject) => {
     try { if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath); } catch (e) {}
 
-    const args = [
-      '-y',
-      '-i', videoPath,
-      '-i', audioPath,
-      '-c:v', 'copy',
-      '-c:a', 'aac',
-      '-b:a', '192k',
-      '-map', '0:v:0',
-      '-map', '1:a:0',
-      '-shortest',
-      outputPath
-    ];
+    const ffBin = resolveFfmpegBinary();
+    if (ffBin) {
+      const args = [
+        '-y',
+        '-i', videoPath,
+        '-i', audioPath,
+        '-c:v', 'copy',
+        '-c:a', 'aac',
+        '-b:a', '192k',
+        '-map', '0:v:0',
+        '-map', '1:a:0',
+        '-shortest',
+        outputPath
+      ];
 
-    const proc = spawn(ffmpegPath, args);
-    let errOutput = '';
-    proc.stderr.on('data', d => (errOutput += d.toString()));
-    proc.on('close', code => {
-      if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
-        resolve(true);
-      } else {
-        reject(new Error(`FFmpeg merge error (${code}): ${errOutput.slice(-300)}`));
-      }
-    });
+      const proc = spawn(ffBin, args, { windowsHide: true });
+      let errOutput = '';
+      proc.stderr.on('data', d => (errOutput += d.toString()));
+      proc.on('close', code => {
+        if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
+          resolve(true);
+        } else {
+          reject(new Error(`FFmpeg merge error (${code}): ${errOutput.slice(-300)}`));
+        }
+      });
+      return;
+    }
+
+    // Fallback: Native Windows 10/11 MediaComposition API (works in standalone Downly.exe!)
+    if (process.platform === 'win32' && embeddedAssets.MERGE_MEDIA_PS1) {
+      const tempPs1 = path.join(os.tmpdir(), `downly_mux_${Date.now()}.ps1`);
+      fs.writeFileSync(tempPs1, embeddedAssets.MERGE_MEDIA_PS1, 'utf8');
+      const proc = spawn('powershell.exe', [
+        '-NoProfile',
+        '-NonInteractive',
+        '-WindowStyle', 'Hidden',
+        '-ExecutionPolicy', 'Bypass',
+        '-File', tempPs1,
+        '-videoPath', videoPath,
+        '-audioPath', audioPath,
+        '-outputPath', outputPath
+      ], { windowsHide: true });
+      let errOutput = '';
+      proc.stderr.on('data', d => (errOutput += d.toString()));
+      proc.on('close', code => {
+        try { fs.unlinkSync(tempPs1); } catch (e) {}
+        if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
+          resolve(true);
+        } else {
+          reject(new Error(`Windows Media mux error (${code}): ${errOutput.slice(-300)}`));
+        }
+      });
+      return;
+    }
+
+    reject(new Error('No media muxer available'));
   });
 }
 
@@ -239,7 +293,9 @@ class DownloadTask {
     this.error = null;
 
     try {
-      await fsp.mkdir(this.downloadDir, { recursive: true });
+      if (!fs.existsSync(this.downloadDir)) {
+        try { await fsp.mkdir(this.downloadDir, { recursive: true }); } catch (e) {}
+      }
 
       if (isYouTubeUrl(this.url)) {
         await this.resolveYouTube();
@@ -735,9 +791,61 @@ class DownloadManager {
 // Web Server, Quality Probe API & WebSocket Daemon
 // -----------------------------------------------------------------------------
 
+function ensureExtensionExtracted() {
+  const exeDir = path.dirname(process.execPath);
+  const localExt = path.join(exeDir, 'extension');
+  if (fs.existsSync(localExt) && fs.existsSync(path.join(localExt, 'manifest.json'))) {
+    return localExt;
+  }
+  const appData = process.env.LOCALAPPDATA || path.join(os.homedir(), '.downly');
+  const targetDir = path.join(appData, 'Downly', 'extension');
+  try {
+    if (!fs.existsSync(targetDir)) {
+      try { fs.mkdirSync(targetDir, { recursive: true }); } catch (e) {}
+    }
+    if (embeddedAssets.EXTENSION_FILES) {
+      for (const [name, content] of Object.entries(embeddedAssets.EXTENSION_FILES)) {
+        fs.writeFileSync(path.join(targetDir, name), content, 'utf8');
+      }
+    }
+  } catch (e) {}
+  return targetDir;
+}
+
+function launchDesktopAppWindow(localUrl) {
+  if (process.platform === 'win32') {
+    const browserCandidates = [
+      'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+      'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+      path.join(process.env.LOCALAPPDATA || '', 'Microsoft\\Edge\\Application\\msedge.exe'),
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+      path.join(process.env.LOCALAPPDATA || '', 'Google\\Chrome\\Application\\chrome.exe')
+    ];
+    for (const bin of browserCandidates) {
+      if (bin && fs.existsSync(bin)) {
+        spawn(bin, [`--app=${localUrl}`, '--window-size=1180,760'], {
+          detached: true,
+          stdio: 'ignore',
+          windowsHide: true
+        }).unref();
+        return;
+      }
+    }
+    spawn('cmd.exe', ['/c', 'start', '', localUrl], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true
+    }).unref();
+  } else {
+    spawn('xdg-open', [localUrl], { detached: true, stdio: 'ignore' }).unref();
+  }
+}
+
 function startServer(manager, port = PORT, autoOpen = true) {
-  const uiHtmlPath = path.join(__dirname, 'src', 'server', 'ui.html');
-  // ui.html is loaded dynamically per request
+  const exeDir = path.dirname(process.execPath);
+  const devUiPath = path.join(exeDir, 'src', 'server', 'ui.html');
+  ensureExtensionExtracted();
 
   const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -755,7 +863,10 @@ function startServer(manager, port = PORT, autoOpen = true) {
     // 1. Dashboard UI
     if (pathname === '/' || pathname === '/index.html') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      return res.end(fs.readFileSync(uiHtmlPath, 'utf8'));
+      const html = fs.existsSync(devUiPath)
+        ? fs.readFileSync(devUiPath, 'utf8')
+        : embeddedAssets.UI_HTML;
+      return res.end(html);
     }
 
     // 2. GET /api/tasks
@@ -906,6 +1017,40 @@ function startServer(manager, port = PORT, autoOpen = true) {
       return res.end(JSON.stringify({ success: ok }));
     }
 
+    // 8. POST /api/tasks/:id/open-folder
+    const openTaskMatch = pathname.match(/^\/api\/tasks\/([^/]+)\/open-folder$/);
+    if (openTaskMatch && req.method === 'POST') {
+      const task = manager.getTask(openTaskMatch[1]);
+      if (task && process.platform === 'win32') {
+        if (fs.existsSync(task.outputPath)) {
+          spawn('explorer.exe', [`/select,${task.outputPath}`], { detached: true, stdio: 'ignore' }).unref();
+        } else {
+          spawn('explorer.exe', [task.downloadDir], { detached: true, stdio: 'ignore' }).unref();
+        }
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ success: true }));
+    }
+
+    // 9. POST /api/open-downloads
+    if (pathname === '/api/open-downloads' && req.method === 'POST') {
+      if (process.platform === 'win32') {
+        spawn('explorer.exe', [manager.downloadDir], { detached: true, stdio: 'ignore' }).unref();
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ success: true, path: manager.downloadDir }));
+    }
+
+    // 10. POST /api/open-extension
+    if (pathname === '/api/open-extension' && req.method === 'POST') {
+      const extDir = ensureExtensionExtracted();
+      if (process.platform === 'win32') {
+        spawn('explorer.exe', [extDir], { detached: true, stdio: 'ignore' }).unref();
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ success: true, path: extDir }));
+    }
+
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');
   });
@@ -973,8 +1118,7 @@ function startServer(manager, port = PORT, autoOpen = true) {
     console.log('============================================================');
 
     if (autoOpen) {
-      const openCmd = process.platform === 'win32' ? 'start' : 'xdg-open';
-      require('node:child_process').exec(`${openCmd} ${localUrl}`);
+      launchDesktopAppWindow(localUrl);
     }
   });
 
@@ -986,9 +1130,9 @@ function startServer(manager, port = PORT, autoOpen = true) {
       console.log('🌐 Opening Dashboard in your browser...');
       console.log('============================================================');
       if (autoOpen) {
-        const openCmd = process.platform === 'win32' ? 'start' : 'xdg-open';
-        require('node:child_process').exec(`${openCmd} ${localUrl}`);
+        launchDesktopAppWindow(localUrl);
       }
+      setTimeout(() => process.exit(0), 1000);
       return;
     }
     console.error('Server error:', err.message);
