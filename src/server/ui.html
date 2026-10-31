@@ -653,6 +653,11 @@
             <option value="audio">🎵 Audio Only (128kbps AAC M4A)</option>
           </select>
         </div>
+        <div class="form-group" id="audioLanguageWrap" style="display: none; margin-top: 10px; margin-bottom: 0;">
+          <label class="form-label" style="color: #34d399;">🌐 Audio Language Track (অডিও ভাষা)</label>
+          <select class="form-input" id="audioLanguageSelect" style="border-color: #10b981; background: #0f172a;">
+          </select>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Custom Filename (Optional)</label>
@@ -1032,6 +1037,18 @@
             sel.innerHTML = data.qualities.map(q => 
               `<option value="${q.id}">${q.label} (${q.sizeFormatted})</option>`
             ).join('');
+
+            const langWrap = document.getElementById('audioLanguageWrap');
+            const langSel = document.getElementById('audioLanguageSelect');
+            if (data.audioTracks && data.audioTracks.length > 1) {
+              langWrap.style.display = 'block';
+              langSel.innerHTML = data.audioTracks.map(t => {
+                const isBn = t.name.toLowerCase().includes('bangla') || t.id.startsWith('bn');
+                return `<option value="${t.id}" ${isBn ? 'selected' : ''}>${t.name} ${t.isDefault ? '(Default)' : ''}</option>`;
+              }).join('');
+            } else {
+              langWrap.style.display = 'none';
+            }
           } else {
             wrap.style.display = 'none';
           }
@@ -1053,6 +1070,13 @@
         ? qualityEl.value
         : undefined;
 
+      const audioTrackEl = document.getElementById('audioLanguageSelect');
+      const audioTrack = (document.getElementById('videoPreviewWrap').style.display !== 'none' && 
+                          document.getElementById('audioLanguageWrap').style.display !== 'none' && 
+                          audioTrackEl)
+        ? audioTrackEl.value
+        : undefined;
+
       await fetch('/api/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1060,6 +1084,7 @@
           url,
           filename: customName,
           quality,
+          audioTrack,
           connections,
           speed_limit: speedLimit
         })
@@ -1068,6 +1093,7 @@
       document.getElementById('downloadUrl').value = '';
       document.getElementById('customFilename').value = '';
       document.getElementById('videoPreviewWrap').style.display = 'none';
+      document.getElementById('audioLanguageWrap').style.display = 'none';
       closeAddModal();
     }
 

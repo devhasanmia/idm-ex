@@ -124,24 +124,34 @@
     `;
 
     // Default click: 1080p
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       e.preventDefault();
-      triggerDownload('1080p', videoEl);
+      await triggerDownload('1080p', videoEl);
     });
 
     menu.querySelectorAll('.idm-rs-q-item').forEach(item => {
-      item.addEventListener('click', (e) => {
+      item.addEventListener('click', async (e) => {
         e.stopPropagation();
         e.preventDefault();
         const q = item.getAttribute('data-q');
-        triggerDownload(q, videoEl);
+        await triggerDownload(q, videoEl);
       });
     });
 
     container.appendChild(btn);
     container.appendChild(menu);
     parent.appendChild(container);
+
+    // If on YouTube, query the active audio track to show in button/menu
+    if (location.hostname.includes('youtube.com')) {
+      getYouTubeActiveAudioTrack().then(track => {
+        if (track && (track.displayName || track.id)) {
+          const trackName = track.displayName || track.id;
+          btn.innerHTML = `⚡ Download [${trackName}]`;
+        }
+      });
+    }
 
     let hideTimeout;
     parent.addEventListener('mouseenter', () => {
@@ -155,28 +165,67 @@
     });
   }
 
-  function triggerDownload(quality, videoEl) {
+  function getYouTubeActiveAudioTrack() {
+    return new Promise((resolve) => {
+      if (!location.hostname.includes('youtube.com')) return resolve(null);
+
+      const handler = (e) => {
+        window.removeEventListener('__idm_audio_track_res__', handler);
+        resolve(e.detail);
+      };
+      window.addEventListener('__idm_audio_track_res__', handler);
+
+      const script = document.createElement('script');
+      script.textContent = `
+        (function() {
+          try {
+            const player = document.getElementById('movie_player');
+            const track = player && typeof player.getAudioTrack === 'function' ? player.getAudioTrack() : null;
+            window.dispatchEvent(new CustomEvent('__idm_audio_track_res__', { detail: track }));
+          } catch (e) {
+            window.dispatchEvent(new CustomEvent('__idm_audio_track_res__', { detail: null }));
+          }
+        })();
+      `;
+      (document.head || document.documentElement).appendChild(script);
+      script.remove();
+
+      setTimeout(() => resolve(null), 250);
+    });
+  }
+
+  async function triggerDownload(quality, videoEl, customAudioTrack) {
     let targetUrl = window.location.href;
     if (videoEl.src && !videoEl.src.startsWith('blob:') && !location.hostname.includes('youtube.com')) {
       targetUrl = videoEl.src;
     }
 
-    sendToIdm(targetUrl, quality);
+    let audioTrack = customAudioTrack;
+    if (!audioTrack && location.hostname.includes('youtube.com')) {
+      const activeTrack = await getYouTubeActiveAudioTrack();
+      if (activeTrack && (activeTrack.id || activeTrack.displayName)) {
+        audioTrack = activeTrack.id || activeTrack.displayName;
+      }
+    }
+
+    sendToIdm(targetUrl, quality, audioTrack);
   }
 
-  function sendToIdm(url, quality = '1080p') {
+  function sendToIdm(url, quality = '1080p', audioTrack = null) {
     fetch('http://127.0.0.1:8080/api/download', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         url: url,
         quality: quality,
+        audioTrack: audioTrack,
         connections: 16
       })
     })
       .then(res => {
         if (res.ok) {
-          showToast(`✓ [${quality.toUpperCase()}] Transferred to IDM-RS Turbo Downloader!`);
+          const trackLabel = audioTrack ? ` (${audioTrack})` : '';
+          showToast(`✓ [${quality.toUpperCase()}${trackLabel}] Transferred to IDM-RS Turbo Downloader!`);
         } else {
           showToast('⚠️ Could not connect to IDM-RS. Make sure IDM-RS is running!');
         }

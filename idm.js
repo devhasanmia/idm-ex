@@ -154,6 +154,7 @@ class DownloadTask {
     this.connections = Math.min(64, Math.max(1, options.connections || 16));
     this.speedLimitBps = options.speedLimitBps || 0;
     this.requestedQuality = options.quality || '1080p'; // '1080p' | '720p' | '480p' | '360p' | 'audio'
+    this.requestedAudioTrack = options.audioTrack || null; // e.g. 'bn.3' or 'Bangla' or 'en'
 
     this.totalSize = 0;
     this.supportsRange = false;
@@ -220,6 +221,7 @@ class DownloadTask {
       eta_seconds: eta,
       connections: this.connections,
       quality: this.requestedQuality,
+      audio_track: this.requestedAudioTrack,
       segments: displaySegments.map(s => ({
         id: s.id,
         start_byte: s.startByte,
@@ -269,17 +271,54 @@ class DownloadTask {
 
     const formats = info.formats || [];
 
-    // Find best audio track (AAC M4A / highest bitrate)
-    const audioFormats = formats
-      .filter(f => f.hasAudio && !f.hasVideo && f.url)
-      .sort((a, b) => (b.audioBitrate || 0) - (a.audioBitrate || 0));
+    // Filter all audio formats
+    const allAudioFormats = formats.filter(f => f.hasAudio && !f.hasVideo && f.url);
 
-    const audioFormat = audioFormats.find(f => f.container === 'mp4' || (f.codecs && f.codecs.includes('mp4a')))
-                     || audioFormats[0];
+    // Filter by requestedAudioTrack if specified
+    let selectedAudioFormats = allAudioFormats;
+    if (this.requestedAudioTrack) {
+      const req = this.requestedAudioTrack.toLowerCase().trim();
+      const matched = allAudioFormats.filter(f => {
+        if (!f.audioTrack) return false;
+        const id = (f.audioTrack.id || '').toLowerCase();
+        const name = (f.audioTrack.displayName || '').toLowerCase();
+        return id === req || id.startsWith(req) || name === req || name.includes(req);
+      });
+      if (matched.length > 0) {
+        selectedAudioFormats = matched;
+      }
+    } else {
+      // Default auto-selection: prioritize Bangla / Bengali if present, else original / default track
+      const bnTracks = allAudioFormats.filter(f => {
+        if (!f.audioTrack) return false;
+        const id = (f.audioTrack.id || '').toLowerCase();
+        const name = (f.audioTrack.displayName || '').toLowerCase();
+        return id.startsWith('bn') || name.includes('bangla') || name.includes('bengali');
+      });
+      if (bnTracks.length > 0) {
+        selectedAudioFormats = bnTracks;
+      } else {
+        const defaultTracks = allAudioFormats.filter(f => f.audioTrack && f.audioTrack.audioIsDefault);
+        if (defaultTracks.length > 0) selectedAudioFormats = defaultTracks;
+      }
+    }
+
+    // Sort candidate audio formats by bitrate descending
+    selectedAudioFormats.sort((a, b) => (b.audioBitrate || 0) - (a.audioBitrate || 0));
+
+    // Prefer AAC/MP4 if available, otherwise first candidate
+    const audioFormat = selectedAudioFormats.find(f => f.container === 'mp4' || (f.codecs && f.codecs.includes('mp4a')))
+                     || selectedAudioFormats[0]
+                     || allAudioFormats[0];
+
+    const hasMultiAudio = new Set(allAudioFormats.map(f => f.audioTrack?.id || f.audioTrack?.displayName).filter(Boolean)).size > 1;
+    const trackLabel = (hasMultiAudio && audioFormat && audioFormat.audioTrack && audioFormat.audioTrack.displayName)
+      ? ` [${audioFormat.audioTrack.displayName}]`
+      : '';
 
     if (this.requestedQuality === 'audio') {
       if (!audioFormat) throw new Error('No audio format found for this video.');
-      this.fileName = sanitizeFileName(title) + '.m4a';
+      this.fileName = sanitizeFileName(title + trackLabel) + '.m4a';
       this.outputPath = path.join(this.downloadDir, this.fileName);
       this.url = audioFormat.url;
       this.totalSize = parseInt(audioFormat.contentLength || '0', 10);
@@ -314,7 +353,7 @@ class DownloadTask {
 
     if (!targetFormat) throw new Error('No suitable video format found.');
 
-    this.fileName = sanitizeFileName(title) + '.mp4';
+    this.fileName = sanitizeFileName(title + trackLabel) + '.mp4';
     this.outputPath = path.join(this.downloadDir, this.fileName);
 
     const vLen = parseInt(targetFormat.contentLength || '0', 10);
@@ -775,6 +814,22 @@ function startServer(manager, port = PORT, autoOpen = true) {
               });
             }
 
+            // Extract unique audio tracks (Multi-Language Audio Tracks)
+            const audioTrackMap = new Map();
+            formats.forEach(f => {
+              if (f.hasAudio && !f.hasVideo && f.audioTrack) {
+                const key = f.audioTrack.id || f.audioTrack.displayName;
+                if (!audioTrackMap.has(key)) {
+                  audioTrackMap.set(key, {
+                    id: f.audioTrack.id,
+                    name: f.audioTrack.displayName,
+                    isDefault: !!f.audioTrack.audioIsDefault
+                  });
+                }
+              }
+            });
+            const audioTracks = Array.from(audioTrackMap.values());
+
             const thumbnail = info.videoDetails.thumbnails?.slice(-1)[0]?.url || '';
             res.writeHead(200, { 'Content-Type': 'application/json' });
             return res.end(JSON.stringify({
@@ -783,12 +838,13 @@ function startServer(manager, port = PORT, autoOpen = true) {
               thumbnail,
               duration: formatDuration(info.videoDetails.lengthSeconds),
               author: info.videoDetails.author?.name || '',
-              qualities
+              qualities,
+              audioTracks
             }));
           }
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ isVideo: false, qualities: [] }));
+          res.end(JSON.stringify({ isVideo: false, qualities: [], audioTracks: [] }));
         } catch (e) {
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: e.message }));
@@ -812,6 +868,7 @@ function startServer(manager, port = PORT, autoOpen = true) {
             url: data.url,
             fileName: data.filename,
             quality: data.quality || '1080p',
+            audioTrack: data.audioTrack || null,
             connections: parseInt(data.connections || '16', 10),
             speedLimitBps: parseInt(data.speed_limit || '0', 10)
           });
