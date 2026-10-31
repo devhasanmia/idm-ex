@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "IDM-RS Turbo Download Integration",
+  "name": "Downly — Smart Download Accelerator",
   "version": "1.0.0",
-  "description": "Accelerate and capture browser downloads directly with IDM-RS Turbo Engine",
+  "description": "Accelerate and capture browser downloads and HD videos directly with Downly",
   "permissions": [
     "contextMenus",
     "activeTab",
@@ -23,7 +23,6 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "IDM-RS Turbo Downloader"
+    "default_title": "Downly Smart Downloader"
   }
 }
-

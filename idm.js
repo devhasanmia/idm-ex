@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * ⚡ IDM-RS Turbo Download Accelerator
+ * ⚡ Downly Turbo Download Accelerator
  * High-performance Dynamic Multi-Segment Downloader & Web Dashboard
  * With Full HD Video Quality Selector & Automatic Audio Muxing (FFmpeg)
  */
@@ -529,7 +529,7 @@ class DownloadTask {
       }
 
       if (!aStat || aStat.size === 0) {
-        console.warn(`[IDM-RS] ⚠️ Audio stream empty. Keeping video only.`);
+        console.warn(`[Downly] ⚠️ Audio stream empty. Keeping video only.`);
         await fsp.copyFile(this.videoTempPath, this.outputPath);
         try { await fsp.unlink(this.videoTempPath); } catch (e) {}
         this.status = 'Completed';
@@ -537,16 +537,16 @@ class DownloadTask {
       }
 
       try {
-        console.log(`[IDM-RS] Muxing video and audio into ${this.outputPath}...`);
+        console.log(`[Downly] Muxing video and audio into ${this.outputPath}...`);
         await mergeVideoAndAudio(this.videoTempPath, this.audioTempPath, this.outputPath);
 
         try { await fsp.unlink(this.videoTempPath); } catch (e) {}
         try { await fsp.unlink(this.audioTempPath); } catch (e) {}
 
         this.status = 'Completed';
-        console.log(`[IDM-RS] ✅ Video + Audio successfully merged: ${this.outputPath}`);
+        console.log(`[Downly] ✅ Video + Audio successfully merged: ${this.outputPath}`);
       } catch (muxErr) {
-        console.error('[IDM-RS] Mux error:', muxErr.message);
+        console.error('[Downly] Mux error:', muxErr.message);
         try {
           await fsp.copyFile(this.videoTempPath, this.outputPath);
         } catch (e) {}
@@ -596,7 +596,7 @@ class DownloadTask {
 
             if (fileHandle) {
               writeQueue = writeQueue.then(() => fileHandle.write(chunk, 0, len, writeOffset)).catch(e => {
-                console.error(`[IDM-RS] Segment write error:`, e.message);
+                console.error(`[Downly] Segment write error:`, e.message);
               });
             }
 
@@ -737,7 +737,7 @@ class DownloadManager {
 
 function startServer(manager, port = PORT, autoOpen = true) {
   const uiHtmlPath = path.join(__dirname, 'src', 'server', 'ui.html');
-  const uiHtml = fs.readFileSync(uiHtmlPath, 'utf8');
+  // ui.html is loaded dynamically per request
 
   const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -755,7 +755,7 @@ function startServer(manager, port = PORT, autoOpen = true) {
     // 1. Dashboard UI
     if (pathname === '/' || pathname === '/index.html') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      return res.end(uiHtml);
+      return res.end(fs.readFileSync(uiHtmlPath, 'utf8'));
     }
 
     // 2. GET /api/tasks
@@ -966,7 +966,7 @@ function startServer(manager, port = PORT, autoOpen = true) {
   server.listen(port, '127.0.0.1', () => {
     const localUrl = `http://127.0.0.1:${port}`;
     console.log('============================================================');
-    console.log('⚡ IDM-RS Turbo Download Manager is running!');
+    console.log('⚡ Downly Turbo Download Manager is running!');
     console.log(`🌐 Dashboard & Web UI: ${localUrl}`);
     console.log(`🧩 Browser Extension API: ${localUrl}/api/download`);
     console.log(`📁 Download directory: ${manager.downloadDir}`);
@@ -982,7 +982,7 @@ function startServer(manager, port = PORT, autoOpen = true) {
     if (err.code === 'EADDRINUSE') {
       const localUrl = `http://127.0.0.1:${port}`;
       console.log('============================================================');
-      console.log(`⚡ IDM-RS is already running and active on ${localUrl}`);
+      console.log(`⚡ Downly is already running and active on ${localUrl}`);
       console.log('🌐 Opening Dashboard in your browser...');
       console.log('============================================================');
       if (autoOpen) {
@@ -1006,7 +1006,7 @@ async function runCliDownload(targetUrl, options = {}) {
   const connections = options.connections || 16;
   const quality = options.quality || '1080p';
 
-  console.log('⚡ IDM-RS: Initializing multi-part turbo download...');
+  console.log('⚡ Downly: Initializing multi-part turbo download...');
   console.log(`🔗 URL: ${targetUrl}`);
   console.log(`🚀 Threads: ${connections} | Quality: ${quality}`);
 
@@ -1063,7 +1063,7 @@ function main() {
 
   if (cmd === 'help' || cmd === '--help' || cmd === '-h') {
     console.log(`
-⚡ IDM-RS: Ultra-Fast Dynamic Multi-Segment Internet Download Manager
+⚡ Downly: Ultra-Fast Dynamic Multi-Segment Internet Download Manager
 
 USAGE:
     node idm.js                          Start Web Dashboard GUI & open browser

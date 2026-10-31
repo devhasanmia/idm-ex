@@ -1,8 +1,8 @@
 [package]
-name = "idm-rs"
+name = "downly"
 version = "1.0.0"
 edition = "2021"
-authors = ["IDM-RS Team"]
+authors = ["Downly Team"]
 description = "Ultra-Fast Dynamic Multi-Segment Internet Download Manager in Rust"
 
 [dependencies]

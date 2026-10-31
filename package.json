@@ -1,9 +1,10 @@
 {
-  "name": "idm-rs",
+  "name": "downly",
   "version": "1.0.0",
-  "description": "Ultra-Fast Dynamic Multi-Segment Internet Download Manager (Modern IDM Alternative)",
+  "description": "Downly — Modern Multi-Segment Download Manager & Video Accelerator",
   "main": "idm.js",
   "bin": {
+    "downly": "idm.js",
     "idm": "idm.js"
   },
   "scripts": {
@@ -11,7 +12,7 @@
     "serve": "node idm.js serve",
     "help": "node idm.js --help"
   },
-  "author": "IDM-RS Team",
+  "author": "Downly Team",
   "license": "MIT",
   "dependencies": {
     "@distube/ytdl-core": "^5.2.0",

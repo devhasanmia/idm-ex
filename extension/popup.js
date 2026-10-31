@@ -7,12 +7,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const res = await fetch("http://127.0.0.1:8080/api/tasks");
     if (res.ok) {
-      daemonStatus.innerHTML = '<span class="status-dot"></span> Engine Online';
+      daemonStatus.innerHTML = '<span class="status-dot"></span> Downly Online';
     } else {
       daemonStatus.innerHTML = '<span class="status-dot offline"></span> Offline';
     }
   } catch (e) {
-    daemonStatus.innerHTML = '<span class="status-dot offline"></span> Engine Offline (Run idm-rs)';
+    daemonStatus.innerHTML = '<span class="status-dot offline"></span> Offline (Start Downly)';
   }
 
   startBtn.addEventListener("click", async () => {
@@ -28,18 +28,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       if (res.ok) {
-        startBtn.innerText = "✓ Sent to IDM-RS!";
+        startBtn.innerText = "✓ Sent to Downly!";
         setTimeout(() => {
-          startBtn.innerText = "⚡ Accelerated Download";
+          startBtn.innerText = "Download with Downly";
           urlInput.value = "";
         }, 1500);
       } else {
         alert("Server returned error");
-        startBtn.innerText = "⚡ Accelerated Download";
+        startBtn.innerText = "Download with Downly";
       }
     } catch (e) {
-      alert("Could not reach IDM-RS engine. Make sure idm-rs is running!");
-      startBtn.innerText = "⚡ Accelerated Download";
+      alert("Could not reach Downly engine. Make sure Downly is running!");
+      startBtn.innerText = "Download with Downly";
     }
   });
 
@@ -47,4 +47,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     chrome.tabs.create({ url: "http://127.0.0.1:8080" });
   });
 });
-

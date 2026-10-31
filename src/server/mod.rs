@@ -17,7 +17,7 @@ pub async fn start_server(
     let listener = tokio::net::TcpListener::bind(addr).await?;
     let local_url = format!("http://127.0.0.1:{}", port);
     println!("============================================================");
-    println!("⚡ IDM-RS Turbo Download Manager is running!");
+    println!("⚡ Downly Turbo Download Manager is running!");
     println!("🌐 Dashboard & Web UI: {}", local_url);
     println!("🧩 Browser Extension API: {}/api/download", local_url);
     println!("============================================================");

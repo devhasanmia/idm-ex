@@ -1,100 +1,191 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IDM-RS Turbo Download Manager</title>
+  <title>Downly — Modern Download Manager</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0b0f19;
-      --card-bg: rgba(18, 24, 38, 0.85);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --primary: #3b82f6;
-      --primary-glow: rgba(59, 130, 246, 0.35);
-      --accent: #06b6d4;
+    :root[data-theme="light"] {
+      --bg-base: #f4f6fb;
+      --bg-mesh-1: rgba(99, 102, 241, 0.08);
+      --bg-mesh-2: rgba(168, 85, 247, 0.07);
+      --bg-mesh-3: rgba(20, 184, 166, 0.06);
+      --surface: rgba(255, 255, 255, 0.82);
+      --surface-solid: #ffffff;
+      --surface-hover: rgba(248, 250, 252, 0.95);
+      --surface-subtle: #f1f5f9;
+      --sidebar-bg: rgba(255, 255, 255, 0.75);
+      --border: rgba(226, 232, 240, 0.9);
+      --border-strong: #cbd5e1;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-soft: rgba(99, 102, 241, 0.1);
+      --primary-glow: rgba(99, 102, 241, 0.22);
+      --accent: #8b5cf6;
       --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.12);
       --warning: #f59e0b;
-      --danger: #ef4444;
-      --text: #f3f4f6;
-      --text-muted: #9ca3af;
-      --sidebar-width: 240px;
+      --warning-soft: rgba(245, 158, 11, 0.12);
+      --danger: #f43f5e;
+      --danger-soft: rgba(244, 63, 94, 0.12);
+      --info: #0ea5e9;
+      --info-soft: rgba(14, 165, 233, 0.12);
+      --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.04), 0 1px 3px -1px rgba(15, 23, 42, 0.03);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.02);
+      --shadow-lg: 0 20px 40px -12px rgba(15, 23, 42, 0.12);
+      --modal-backdrop: rgba(15, 23, 42, 0.35);
+      --graph-line: #6366f1;
+      --graph-fill-top: rgba(99, 102, 241, 0.22);
+      --graph-fill-bottom: rgba(99, 102, 241, 0.0);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root[data-theme="dark"] {
+      --bg-base: #11131c;
+      --bg-mesh-1: rgba(99, 102, 241, 0.11);
+      --bg-mesh-2: rgba(139, 92, 246, 0.08);
+      --bg-mesh-3: rgba(45, 212, 191, 0.06);
+      --surface: rgba(24, 28, 42, 0.78);
+      --surface-solid: #1b2030;
+      --surface-hover: rgba(32, 37, 54, 0.9);
+      --surface-subtle: rgba(255, 255, 255, 0.05);
+      --sidebar-bg: rgba(20, 24, 36, 0.75);
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      --primary: #818cf8;
+      --primary-hover: #6366f1;
+      --primary-soft: rgba(129, 140, 248, 0.14);
+      --primary-glow: rgba(129, 140, 248, 0.25);
+      --accent: #a78bfa;
+      --success: #34d399;
+      --success-soft: rgba(52, 211, 153, 0.14);
+      --warning: #fbbf24;
+      --warning-soft: rgba(251, 191, 36, 0.14);
+      --danger: #fb7185;
+      --danger-soft: rgba(251, 113, 133, 0.14);
+      --info: #38bdf8;
+      --info-soft: rgba(56, 189, 248, 0.14);
+      --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 12px 28px -6px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.55);
+      --modal-backdrop: rgba(8, 10, 18, 0.65);
+      --graph-line: #818cf8;
+      --graph-fill-top: rgba(129, 140, 248, 0.25);
+      --graph-fill-bottom: rgba(129, 140, 248, 0.0);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
       display: flex;
       height: 100vh;
       overflow: hidden;
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
+      background-image:
+        radial-gradient(circle at 10% 10%, var(--bg-mesh-1) 0%, transparent 45%),
+        radial-gradient(circle at 90% 15%, var(--bg-mesh-2) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, var(--bg-mesh-3) 0%, transparent 50%);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      padding: 16px;
+      gap: 16px;
     }
 
-    /* Sidebar */
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 999px;
+    }
+
+    /* Floating Sidebar */
     aside {
-      width: var(--sidebar-width);
-      background: rgba(13, 18, 30, 0.95);
-      border-right: 1px solid var(--card-border);
+      width: 256px;
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
       display: flex;
       flex-direction: column;
-      padding: 24px 16px;
-      backdrop-filter: blur(12px);
+      padding: 22px 16px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-md);
       z-index: 10;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 0 8px 24px 8px;
-      border-bottom: 1px solid var(--card-border);
+      padding: 4px 10px 20px 10px;
+      border-bottom: 1px solid var(--border);
       margin-bottom: 20px;
     }
+
     .brand-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, #3b82f6, #06b6d4);
-      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 55%, #ec4899 100%);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 20px;
-      box-shadow: 0 0 16px var(--primary-glow);
-    }
-    .brand-title {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(90deg, #fff, #93c5fd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .brand-badge {
-      font-size: 10px;
-      font-weight: 700;
-      background: rgba(59, 130, 246, 0.2);
-      color: #60a5fa;
-      padding: 2px 6px;
-      border-radius: 4px;
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #ffffff;
+      box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.45);
+      flex-shrink: 0;
     }
 
-    .nav-label {
+    .brand-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.2px;
+      margin-top: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-section-title {
       font-size: 11px;
       text-transform: uppercase;
       font-weight: 700;
       color: var(--text-muted);
-      letter-spacing: 0.8px;
+      letter-spacing: 0.7px;
       padding: 0 12px;
       margin-bottom: 8px;
     }
+
     .nav-menu {
       list-style: none;
       display: flex;
@@ -102,350 +193,778 @@
       gap: 4px;
       margin-bottom: 24px;
     }
+
     .nav-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 14px;
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-size: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-size: 13.5px;
       font-weight: 500;
       cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .nav-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+      opacity: 0.75;
       transition: all 0.2s ease;
     }
-    .nav-item:hover, .nav-item.active {
-      background: rgba(59, 130, 246, 0.12);
-      color: #fff;
+
+    .nav-item:hover {
+      background: var(--surface-subtle);
+      color: var(--text-primary);
     }
+
+    .nav-item:hover svg {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
     .nav-item.active {
-      border-left: 3px solid var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
       font-weight: 600;
     }
+
+    .nav-item.active svg {
+      opacity: 1;
+      color: var(--primary);
+    }
+
     .nav-count {
       font-size: 11px;
+      font-weight: 600;
       font-family: 'JetBrains Mono', monospace;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 2px 6px;
-      border-radius: 12px;
+      background: var(--surface-subtle);
+      color: var(--text-secondary);
+      padding: 2px 8px;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item.active .nav-count {
+      background: var(--primary);
+      color: #ffffff;
     }
 
     .sidebar-footer {
       margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid var(--card-border);
-      font-size: 12px;
-      color: var(--text-muted);
+      padding: 14px;
+      background: var(--surface-subtle);
+      border-radius: 16px;
+      border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
+
     .engine-status {
       display: flex;
       align-items: center;
       gap: 8px;
-      color: var(--success);
+      font-size: 12.5px;
+      color: var(--text-primary);
       font-weight: 600;
     }
+
     .status-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       background: var(--success);
-      box-shadow: 0 0 8px var(--success);
+      box-shadow: 0 0 0 3px var(--success-soft);
+      animation: pulseDot 2.5s infinite ease-in-out;
     }
 
-    /* Main Content */
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+    }
+
+    .engine-meta {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Main Area */
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      padding: 24px 32px;
+      gap: 16px;
+      min-width: 0;
     }
 
+    /* Top Header Bar */
     header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 16px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      gap: 16px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-sm);
     }
-    .header-actions {
+
+    .header-left h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+
+    .header-left p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .header-right {
       display: flex;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
     }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 14px 9px 36px;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-family: inherit;
+      width: 220px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      width: 260px;
+      border-color: var(--primary);
+      background: var(--surface-solid);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
     .btn {
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 14px;
+      padding: 9px 16px;
+      border-radius: 12px;
+      font-size: 13px;
       font-weight: 600;
+      font-family: inherit;
       cursor: pointer;
       border: 1px solid transparent;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.2s;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: #fff;
-      box-shadow: 0 4px 12px var(--primary-glow);
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      transform: translateY(-1px);
-    }
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: var(--card-border);
-      color: var(--text);
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      white-space: nowrap;
     }
 
-    /* Stats Banner */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.2;
     }
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: #ffffff;
+      box-shadow: 0 6px 16px -3px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px -3px var(--primary-glow);
+      filter: brightness(1.05);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--surface-subtle);
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
       border-radius: 12px;
-      padding: 16px 20px;
-      backdrop-filter: blur(8px);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--surface-hover);
+      color: var(--primary);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Stats & Speed Overview Row */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) 1.5fr;
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px 18px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .stat-label {
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .stat-value {
-      font-size: 24px;
-      font-weight: 800;
-      font-family: 'JetBrains Mono', monospace;
-      color: #fff;
-    }
-    .stat-sub {
-      font-size: 12px;
-      color: var(--accent);
     }
 
-    /* Speed Graph */
-    .speed-graph-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 24px;
-      position: relative;
+    .stat-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    .stat-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    .stat-value {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .stat-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Compact Live Speed Graph Card */
+    .speed-graph-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px 18px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
     .graph-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
     }
+
     .graph-title {
-      font-size: 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .peak-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    #speedCanvas {
+      width: 100%;
+      height: 52px;
+      display: block;
+    }
+
+    /* Downloads List Container */
+    .downloads-panel {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
       font-weight: 700;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    #speedCanvas {
-      width: 100%;
-      height: 70px;
-      display: block;
+
+    .downloads-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    /* Downloads Table */
-    .table-container {
-      flex: 1;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      overflow-y: auto;
-      backdrop-filter: blur(8px);
+    /* Modern Soft Download Card Item */
+    .task-card {
+      background: var(--surface-solid);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 18px;
+      display: grid;
+      grid-template-columns: minmax(240px, 2.2fr) minmax(180px, 1.6fr) minmax(100px, 0.8fr) auto;
+      align-items: center;
+      gap: 18px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--shadow-sm);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 13px;
-    }
-    th {
-      background: rgba(0, 0, 0, 0.25);
-      padding: 12px 16px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.6px;
-      border-bottom: 1px solid var(--card-border);
-      position: sticky;
-      top: 0;
-      z-index: 5;
-    }
-    td {
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      vertical-align: middle;
-    }
-    tr:hover {
-      background: rgba(59, 130, 246, 0.04);
+
+    .task-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
     .file-cell {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-weight: 600;
-      color: #fff;
+      gap: 14px;
+      min-width: 0;
       cursor: pointer;
     }
+
     .file-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      background: rgba(59, 130, 246, 0.15);
-      color: #60a5fa;
+      width: 44px;
+      height: 44px;
+      border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
     }
+
+    .file-cell:hover .file-icon {
+      transform: scale(1.05);
+    }
+
+    .file-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.9;
+    }
+
+    .icon-video { background: var(--primary-soft); color: var(--primary); }
+    .icon-audio { background: rgba(236, 72, 153, 0.12); color: #ec4899; }
+    .icon-archive { background: var(--warning-soft); color: var(--warning); }
+    .icon-program { background: var(--info-soft); color: var(--info); }
+    .icon-default { background: var(--success-soft); color: var(--success); }
+
     .file-info {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
+      min-width: 0;
     }
-    .file-url {
-      font-size: 11px;
-      color: var(--text-muted);
-      max-width: 320px;
+
+    .file-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .file-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
-    /* Progress bar */
-    .progress-bar-wrap {
-      width: 100%;
-      min-width: 160px;
-      background: rgba(255, 255, 255, 0.08);
-      height: 8px;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 4px;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #3b82f6, #06b6d4);
-      transition: width 0.3s ease;
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
-    }
-    .progress-stats {
+    .file-meta-sub {
       display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
       color: var(--text-muted);
     }
 
-    /* Badges */
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
+    .file-size-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
     }
+
+    /* Progress Column */
+    .progress-col {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .progress-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .progress-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      background: var(--surface-subtle);
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .progress-bar-fill.completed {
+      background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    .progress-bar-fill.paused {
+      background: var(--warning);
+    }
+
+    .progress-bar-fill.failed {
+      background: var(--danger);
+    }
+
+    /* Speed & ETA Column */
+    .speed-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+    }
+
+    .speed-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .eta-val {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Soft Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      flex-shrink: 0;
+    }
+
     .badge-downloading {
-      background: rgba(59, 130, 246, 0.2);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.4);
+      background: var(--primary-soft);
+      color: var(--primary);
     }
     .badge-completed {
-      background: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.4);
+      background: var(--success-soft);
+      color: var(--success);
     }
     .badge-paused {
-      background: rgba(245, 158, 11, 0.2);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.4);
+      background: var(--warning-soft);
+      color: var(--warning);
     }
     .badge-failed {
-      background: rgba(239, 68, 68, 0.2);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.4);
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+    .badge-quality {
+      background: var(--info-soft);
+      color: var(--info);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      padding: 2px 7px;
+    }
+
+    /* Actions Column */
+    .actions-col {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .action-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: none;
-      color: var(--text);
-      width: 30px;
-      height: 30px;
-      border-radius: 6px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
-      margin-right: 4px;
-    }
-    .action-btn:hover {
-      background: rgba(255, 255, 255, 0.16);
+      transition: all 0.18s ease;
     }
 
-    /* Segment Visualizer Modal */
+    .action-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: transparent;
+      transform: translateY(-1px);
+    }
+
+    .action-btn.danger:hover {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    /* Empty State */
+    .empty-state {
+      margin: auto;
+      padding: 48px 24px;
+      text-align: center;
+      max-width: 380px;
+    }
+
+    .empty-illustration {
+      width: 68px;
+      height: 68px;
+      border-radius: 22px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+
+    .empty-illustration svg {
+      width: 32px;
+      height: 32px;
+      stroke-width: 1.8;
+    }
+
+    .empty-state h3 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    /* Modals */
     .modal-overlay {
       display: none;
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(8px);
+      inset: 0;
+      background: var(--modal-backdrop);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       z-index: 100;
       align-items: center;
       justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     .modal {
-      background: #111827;
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      width: 90%;
-      max-width: 680px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      background: var(--surface-solid);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 560px;
+      padding: 26px;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     .modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
     }
+
     .modal-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 18px;
       font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+
     .close-btn {
-      background: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--surface-subtle);
       border: none;
-      color: var(--text-muted);
-      font-size: 20px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .close-btn:hover {
+      background: var(--danger-soft);
+      color: var(--danger);
     }
 
     .form-group {
@@ -454,53 +973,131 @@
       flex-direction: column;
       gap: 6px;
     }
+
     .form-label {
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
-      color: var(--text-muted);
-    }
-    .form-input {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: #fff;
-      font-family: inherit;
-      font-size: 14px;
-      outline: none;
-    }
-    .form-input:focus {
-      border-color: var(--primary);
+      color: var(--text-secondary);
     }
 
-    /* IDM Connection Matrix Bar */
+    .form-input {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 14px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      background: var(--surface-solid);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    /* Video Preview Box in Modal */
+    .video-preview-card {
+      display: none;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .video-preview-top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    #videoThumb {
+      width: 88px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: none;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Connection Matrix Bar */
     .matrix-bar {
       display: flex;
-      gap: 2px;
-      height: 28px;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 6px;
-      padding: 3px;
-      margin: 16px 0;
-      border: 1px solid var(--card-border);
+      gap: 3px;
+      height: 26px;
+      background: var(--surface-subtle);
+      border-radius: 10px;
+      padding: 4px;
+      margin: 14px 0 18px 0;
+      border: 1px solid var(--border);
     }
+
     .matrix-segment {
       flex: 1;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
+      background: rgba(148, 163, 184, 0.15);
+      border-radius: 5px;
       position: relative;
       overflow: hidden;
     }
+
     .matrix-fill {
       height: 100%;
-      background: linear-gradient(90deg, #3b82f6, #06b6d4);
-      transition: width 0.2s ease;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      border-radius: 5px;
+      transition: width 0.25s ease;
     }
 
-    .empty-state {
-      padding: 48px;
-      text-align: center;
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    .matrix-table th {
+      padding: 10px 12px;
       color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .matrix-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--surface-solid);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      padding: 12px 18px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-lg);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideUp 0.25s ease;
     }
   </style>
 </head>
@@ -509,173 +1106,261 @@
   <!-- Sidebar -->
   <aside>
     <div class="brand">
-      <div class="brand-icon">⚡</div>
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;">
+          <path d="M12 3v12"/>
+          <path d="m7 11 5 5 5-5"/>
+          <path d="M5 20h14"/>
+        </svg>
+      </div>
       <div>
-        <div class="brand-title">IDM-RS</div>
-        <div class="brand-badge">TURBO v1.0</div>
+        <div class="brand-title">Downly</div>
+        <div class="brand-subtitle">Smart Accelerator</div>
       </div>
     </div>
 
-    <div class="nav-label">Categories</div>
+    <div class="nav-section-title">Library</div>
     <ul class="nav-menu">
-      <li class="nav-item active" onclick="filterCategory('all')">
-        <span>⚡ All Downloads</span>
+      <li class="nav-item active" onclick="filterCategory('all', this)">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          <span>All Downloads</span>
+        </div>
         <span class="nav-count" id="count-all">0</span>
       </li>
-      <li class="nav-item" onclick="filterCategory('downloading')">
-        <span>⏳ Downloading</span>
+      <li class="nav-item" onclick="filterCategory('downloading', this)">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
+          <span>Active</span>
+        </div>
         <span class="nav-count" id="count-active">0</span>
       </li>
-      <li class="nav-item" onclick="filterCategory('completed')">
-        <span>✅ Completed</span>
+      <li class="nav-item" onclick="filterCategory('completed', this)">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+          <span>Completed</span>
+        </div>
         <span class="nav-count" id="count-completed">0</span>
       </li>
-      <li class="nav-item" onclick="filterCategory('compressed')">
-        <span>📦 Compressed (ZIP/RAR)</span>
+    </ul>
+
+    <div class="nav-section-title">File Types</div>
+    <ul class="nav-menu">
+      <li class="nav-item" onclick="filterCategory('video', this)">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>
+          <span>Video & Audio</span>
+        </div>
       </li>
-      <li class="nav-item" onclick="filterCategory('video')">
-        <span>🎬 Video & Audio</span>
+      <li class="nav-item" onclick="filterCategory('compressed', this)">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          <span>Archives</span>
+        </div>
       </li>
-      <li class="nav-item" onclick="filterCategory('programs')">
-        <span>💾 Programs (EXE/ISO)</span>
+      <li class="nav-item" onclick="filterCategory('programs', this)">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+          <span>Programs</span>
+        </div>
       </li>
     </ul>
 
     <div class="sidebar-footer">
       <div class="engine-status">
         <span class="status-dot"></span>
-        <span>Rust Tokio Engine Active</span>
+        <span>Downly Engine Ready</span>
       </div>
-      <div>Dynamic Segmentation: 16/32 Threads</div>
-      <div>Zero-Merge Direct I/O Enabled</div>
+      <div class="engine-meta">
+        Multi-Segment Turbo Stream<br>
+        Auto-Mux HD Video & Audio
+      </div>
     </div>
   </aside>
 
-  <!-- Main Area -->
+  <!-- Main Content -->
   <main>
     <header>
-      <div>
-        <h1 style="font-size: 24px; font-weight: 800;">Downloads Dashboard</h1>
-        <p style="font-size: 13px; color: var(--text-muted);">High-performance multi-part accelerated download manager</p>
+      <div class="header-left">
+        <h1>Workspace</h1>
+        <p>Fast, gentle, multi-threaded download manager</p>
       </div>
-      <div class="header-actions">
-        <button class="btn btn-secondary" onclick="openExtensionModal()">🧩 Browser Extension</button>
-        <button class="btn btn-primary" onclick="openAddModal()">+ Add New Download</button>
+
+      <div class="header-right">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search downloads..." oninput="renderTable()">
+        </div>
+
+        <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Switch Light / Dark Mode">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+        </button>
+
+        <button class="btn btn-secondary" onclick="openExtensionModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0Z"/></svg>
+          <span>Browser Extension</span>
+        </button>
+
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          <span>New Download</span>
+        </button>
       </div>
     </header>
 
-    <!-- Top Stats -->
-    <div class="stats-grid">
+    <!-- Overview Row: 4 Soft Stat Cards + Live Speed Graph -->
+    <div class="overview-grid">
       <div class="stat-card">
-        <div class="stat-label">Total Bandwidth</div>
-        <div class="stat-value" id="totalSpeed">0 KB/s</div>
-        <div class="stat-sub">Dynamic Segment Sum</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Active Connections</div>
-        <div class="stat-value" id="activeConnections">0</div>
-        <div class="stat-sub">Multiplexed Streams</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Active Downloads</div>
-        <div class="stat-value" id="activeTasksCount">0</div>
-        <div class="stat-sub">In queue & streaming</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Completed Files</div>
-        <div class="stat-value" id="completedTasksCount">0</div>
-        <div class="stat-sub">Ready in output dir</div>
-      </div>
-    </div>
-
-    <!-- Live Speed Canvas -->
-    <div class="speed-graph-card">
-      <div class="graph-header">
-        <div class="graph-title">
-          <span>📈 Real-Time Speed Monitor</span>
+        <div class="stat-top">
+          <span class="stat-label">Transfer Speed</span>
+          <div class="stat-icon" style="background: var(--primary-soft); color: var(--primary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
         </div>
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);" id="peakSpeed">Peak: 0 KB/s</div>
+        <div class="stat-value" id="totalSpeed">0 B/s</div>
+        <div class="stat-sub">Real-time throughput</div>
       </div>
-      <canvas id="speedCanvas" height="70"></canvas>
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Active Streams</span>
+          <div class="stat-icon" style="background: var(--info-soft); color: var(--info);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="activeConnections">0</div>
+        <div class="stat-sub">Parallel threads</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">In Progress</span>
+          <div class="stat-icon" style="background: var(--warning-soft); color: var(--warning);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="activeTasksCount">0</div>
+        <div class="stat-sub">Active queues</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Completed</span>
+          <div class="stat-icon" style="background: var(--success-soft); color: var(--success);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="completedTasksCount">0</div>
+        <div class="stat-sub">Saved to Downloads</div>
+      </div>
+
+      <div class="speed-graph-card">
+        <div class="graph-header">
+          <div class="graph-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: var(--primary);"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Bandwidth Activity</span>
+          </div>
+          <span class="peak-pill" id="peakSpeed">Peak: 0 B/s</span>
+        </div>
+        <canvas id="speedCanvas" height="52"></canvas>
+      </div>
     </div>
 
-    <!-- Downloads Table -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>File Name</th>
-            <th>Size</th>
-            <th>Progress & Status</th>
-            <th>Speed</th>
-            <th>ETA</th>
-            <th>Threads</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tasksTableBody">
-          <!-- Dynamic tasks rendered here -->
-        </tbody>
-      </table>
+    <!-- Downloads List -->
+    <div class="downloads-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span id="currentCategoryTitle">All Downloads</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">
+          Click any item to inspect multi-thread segments
+        </div>
+      </div>
+
+      <div class="downloads-scroll" id="tasksListContainer">
+        <!-- Dynamic task cards rendered here -->
+      </div>
+
       <div class="empty-state" id="emptyState">
-        <h3>No active downloads</h3>
-        <p style="margin-top: 8px;">Click <b>"+ Add New Download"</b> or send a link from your browser to begin!</p>
+        <div class="empty-illustration">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" x2="12" y1="15" y2="3"/>
+          </svg>
+        </div>
+        <h3>Your download queue is empty</h3>
+        <p>Paste any file or YouTube video link to start downloading with multi-segment acceleration.</p>
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          <span>Add First Download</span>
+        </button>
       </div>
     </div>
   </main>
 
-  <!-- Add Download Modal -->
+  <!-- Add New Download Modal -->
   <div class="modal-overlay" id="addModal">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">⚡ Add New Download</div>
-        <button class="close-btn" onclick="closeAddModal()">&times;</button>
+        <div class="modal-title">
+          <div class="stat-icon" style="background: var(--primary-soft); color: var(--primary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          </div>
+          <span>New Download</span>
+        </div>
+        <button class="close-btn" onclick="closeAddModal()">✕</button>
       </div>
+
       <div class="form-group">
-        <label class="form-label">Download URL</label>
-        <input type="text" class="form-input" id="downloadUrl" placeholder="Paste YouTube video or any file URL..." autofocus oninput="onUrlInput()">
+        <label class="form-label">Download or Video URL</label>
+        <input type="text" class="form-input" id="downloadUrl" placeholder="https://example.com/file.zip or YouTube link..." autofocus oninput="onUrlInput()">
       </div>
-      <!-- Video Preview & Quality Selector -->
-      <div id="videoPreviewWrap" style="display: none; background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 16px;">
-        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
-          <img id="videoThumb" src="" style="width: 80px; height: 48px; object-fit: cover; border-radius: 6px; display: none;">
-          <div>
-            <div id="videoTitlePreview" style="font-weight: 700; font-size: 13px; color: #fff; line-height: 1.4;"></div>
-            <div id="videoMetaPreview" style="font-size: 11px; color: var(--accent); margin-top: 2px;"></div>
+
+      <!-- Smart Video Preview & Quality Selector -->
+      <div class="video-preview-card" id="videoPreviewWrap">
+        <div class="video-preview-top">
+          <img id="videoThumb" src="" alt="Preview">
+          <div style="min-width: 0;">
+            <div id="videoTitlePreview" style="font-weight: 700; font-size: 13.5px; color: var(--text-primary); line-height: 1.35;"></div>
+            <div id="videoMetaPreview" style="font-size: 11.5px; color: var(--primary); margin-top: 3px; font-weight: 500;"></div>
           </div>
         </div>
         <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label" style="color: #67e8f9;">🎬 Select Video Quality / Format</label>
-          <select class="form-input" id="videoQualitySelect" style="border-color: #06b6d4; background: #0f172a;">
-            <option value="1080p">⚡ 1080p Full HD (Video + Audio)</option>
-            <option value="720p">🎬 720p HD (Video + Audio)</option>
-            <option value="360p">📱 360p SD (Video + Audio)</option>
-            <option value="audio">🎵 Audio Only (128kbps AAC M4A)</option>
+          <label class="form-label">Select Quality & Format</label>
+          <select class="form-input" id="videoQualitySelect">
+            <option value="1080p">1080p Full HD (Video + Audio)</option>
+            <option value="720p">720p HD (Video + Audio)</option>
+            <option value="360p">360p SD (Video + Audio)</option>
+            <option value="audio">Audio Only (M4A High Quality)</option>
           </select>
         </div>
-        <div class="form-group" id="audioLanguageWrap" style="display: none; margin-top: 10px; margin-bottom: 0;">
-          <label class="form-label" style="color: #34d399;">🌐 Audio Language Track (অডিও ভাষা)</label>
-          <select class="form-input" id="audioLanguageSelect" style="border-color: #10b981; background: #0f172a;">
-          </select>
+        <div class="form-group" id="audioLanguageWrap" style="display: none; margin-top: 12px; margin-bottom: 0;">
+          <label class="form-label">Audio Language Track (অডিও ভাষা)</label>
+          <select class="form-input" id="audioLanguageSelect"></select>
         </div>
       </div>
+
       <div class="form-group">
-        <label class="form-label">Custom Filename (Optional)</label>
+        <label class="form-label">Save As Filename (Optional)</label>
         <input type="text" class="form-input" id="customFilename" placeholder="Auto-detect from server">
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="form-group">
-          <label class="form-label">Max Connections</label>
+          <label class="form-label">Parallel Threads</label>
           <select class="form-input" id="connectionsCount">
-            <option value="8">8 Threads</option>
-            <option value="16" selected>16 Threads (IDM Turbo)</option>
-            <option value="32">32 Threads (Extreme Bandwidth)</option>
-            <option value="4">4 Threads (Gentle)</option>
-            <option value="1">1 Thread (Sequential)</option>
+            <option value="8">8 Threads (Balanced)</option>
+            <option value="16" selected>16 Threads (Turbo)</option>
+            <option value="32">32 Threads (Max Speed)</option>
+            <option value="4">4 Threads (Light)</option>
+            <option value="1">1 Thread (Single)</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Speed Limit</label>
+          <label class="form-label">Bandwidth Limit</label>
           <select class="form-input" id="speedLimit">
             <option value="0" selected>Unlimited</option>
             <option value="1048576">1 MB/s</option>
@@ -684,45 +1369,46 @@
           </select>
         </div>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
         <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="submitDownload()">Start Download</button>
+        <button class="btn btn-primary" onclick="submitDownload()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          <span>Start Download</span>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Segment Inspector Modal (The IDM Connection Matrix) -->
+  <!-- Segment Inspector Modal -->
   <div class="modal-overlay" id="matrixModal">
-    <div class="modal" style="max-width: 780px;">
+    <div class="modal" style="max-width: 700px;">
       <div class="modal-header">
         <div>
           <div class="modal-title" id="matrixFilename">File Segments</div>
-          <div style="font-size: 12px; color: var(--text-muted);" id="matrixDetails">IDM Dynamic Reallocation Status</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="matrixDetails">Multi-Segment Stream Breakdown</div>
         </div>
-        <button class="close-btn" onclick="closeMatrixModal()">&times;</button>
+        <button class="close-btn" onclick="closeMatrixModal()">✕</button>
       </div>
 
-      <div class="matrix-bar" id="matrixSegmentsBar">
-        <!-- Dynamic colored segments rendered here -->
-      </div>
+      <div class="matrix-bar" id="matrixSegmentsBar"></div>
 
-      <div style="max-height: 260px; overflow-y: auto;">
-        <table>
+      <div style="max-height: 260px; overflow-y: auto; border: 1px solid var(--border); border-radius: 14px;">
+        <table class="matrix-table">
           <thead>
             <tr>
-              <th>Part #</th>
-              <th>Range (Bytes)</th>
+              <th>Segment</th>
+              <th>Byte Range</th>
               <th>Downloaded</th>
               <th>Progress</th>
               <th>Status</th>
             </tr>
           </thead>
-          <tbody id="matrixTableBody">
-          </tbody>
+          <tbody id="matrixTableBody"></tbody>
         </table>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+      <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
         <button class="btn btn-secondary" onclick="closeMatrixModal()">Close</button>
       </div>
     </div>
@@ -732,25 +1418,32 @@
   <div class="modal-overlay" id="extensionModal">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">🧩 Browser Extension & Integration</div>
-        <button class="close-btn" onclick="closeExtensionModal()">&times;</button>
+        <div class="modal-title">
+          <div class="stat-icon" style="background: var(--primary-soft); color: var(--primary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg>
+          </div>
+          <span>Downly Browser Extension</span>
+        </div>
+        <button class="close-btn" onclick="closeExtensionModal()">✕</button>
       </div>
-      <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted); margin-bottom: 16px;">
-        IDM-RS includes a native Chrome / Edge / Brave / Firefox integration extension located in:
-        <br><code style="color: #60a5fa; font-family: 'JetBrains Mono', monospace;">C:\idm-rs\extension</code>
+      <p style="font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 14px;">
+        Capture videos and downloads directly from Chrome, Edge, or Brave using the companion extension located in your project's <code style="color: var(--primary); font-family: 'JetBrains Mono', monospace;">extension</code> folder.
       </p>
-      <div style="background: rgba(255, 255, 255, 0.04); padding: 14px; border-radius: 8px; border: 1px solid var(--card-border); font-size: 13px; margin-bottom: 16px;">
-        <b>How to install:</b><br>
-        1. Open Chrome/Edge and go to <code style="color: #93c5fd;">chrome://extensions</code><br>
-        2. Enable <b>Developer Mode</b> (toggle in top right).<br>
-        3. Click <b>"Load unpacked"</b> and select folder <code style="color: #93c5fd;">C:\idm-rs\extension</code>.<br>
-        4. Any file you download or right-click in your browser is automatically accelerated by IDM-RS!
+      <div style="background: var(--surface-subtle); padding: 16px; border-radius: 16px; border: 1px solid var(--border); font-size: 13px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 18px;">
+        <strong style="color: var(--text-primary);">Quick Setup:</strong><br>
+        1. Open <code style="color: var(--primary);">chrome://extensions</code> in your browser.<br>
+        2. Enable <strong>Developer Mode</strong> in the top-right corner.<br>
+        3. Click <strong>Load unpacked</strong> and select the <code style="color: var(--primary);">extension</code> folder.<br>
+        4. Enjoy one-click floating video downloads & right-click acceleration!
       </div>
       <div style="display: flex; justify-content: flex-end;">
-        <button class="btn btn-primary" onclick="closeExtensionModal()">Got it!</button>
+        <button class="btn btn-primary" onclick="closeExtensionModal()">Done</button>
       </div>
     </div>
   </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <script>
     let tasks = [];
@@ -759,9 +1452,53 @@
     let selectedTaskId = null;
     let currentFilter = 'all';
 
-    // Format bytes
+    // Theme Management
+    function initTheme() {
+      const saved = localStorage.getItem('downly_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+      updateThemeIcon(saved);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('downly_theme', next);
+      updateThemeIcon(next);
+      drawSpeedGraph();
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (theme === 'dark') {
+        icon.innerHTML = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>';
+      } else {
+        icon.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>';
+      }
+    }
+
+    initTheme();
+
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; flex-shrink: 0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
+
+    // Formatters
     function formatBytes(bytes) {
-      if (bytes === 0) return '0 B';
+      if (!bytes || bytes === 0) return '0 B';
       const k = 1024;
       const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -774,15 +1511,40 @@
 
     function formatEta(seconds) {
       if (!seconds || seconds <= 0 || seconds > 86400 * 30) return '--';
-      if (seconds < 60) return seconds + 's';
+      if (seconds < 60) return seconds + 's left';
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
-      if (m < 60) return `${m}m ${s}s`;
+      if (m < 60) return `${m}m ${s}s left`;
       const h = Math.floor(m / 60);
-      return `${h}h ${m % 60}m`;
+      return `${h}h ${m % 60}m left`;
     }
 
-    // Canvas Speed Graph
+    function getFileCategory(fileName) {
+      const ext = (fileName || '').split('.').pop().toLowerCase();
+      if (['mp4', 'mkv', 'webm', 'avi', 'mov', 'mp3', 'm4a', 'wav', 'flac', 'aac'].includes(ext)) return 'video';
+      if (['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz'].includes(ext)) return 'compressed';
+      if (['exe', 'msi', 'iso', 'dmg', 'pkg', 'deb', 'rpm', 'apk'].includes(ext)) return 'programs';
+      return 'other';
+    }
+
+    function getFileIconMarkup(fileName) {
+      const ext = (fileName || '').split('.').pop().toLowerCase();
+      if (['mp4', 'mkv', 'webm', 'avi', 'mov'].includes(ext)) {
+        return `<div class="file-icon icon-video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg></div>`;
+      }
+      if (['mp3', 'm4a', 'wav', 'flac', 'aac'].includes(ext)) {
+        return `<div class="file-icon icon-audio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>`;
+      }
+      if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+        return `<div class="file-icon icon-archive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>`;
+      }
+      if (['exe', 'msi', 'iso', 'dmg', 'apk'].includes(ext)) {
+        return `<div class="file-icon icon-program"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></div>`;
+      }
+      return `<div class="file-icon icon-default"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg></div>`;
+    }
+
+    // Smooth Bezier Speed Graph
     const canvas = document.getElementById('speedCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -795,32 +1557,37 @@
       }
 
       ctx.clearRect(0, 0, w, h);
-      const maxVal = Math.max(...speedHistory, 1024 * 1024); // at least 1MB/s scale
+      const maxVal = Math.max(...speedHistory, 512 * 1024);
+      const styles = getComputedStyle(document.documentElement);
+      const lineColor = styles.getPropertyValue('--graph-line').trim() || '#6366f1';
+      const fillTop = styles.getPropertyValue('--graph-fill-top').trim() || 'rgba(99, 102, 241, 0.22)';
+      const fillBottom = styles.getPropertyValue('--graph-fill-bottom').trim() || 'rgba(99, 102, 241, 0.0)';
 
       ctx.beginPath();
       const step = w / (speedHistory.length - 1);
       for (let i = 0; i < speedHistory.length; i++) {
         const x = i * step;
-        const y = h - (speedHistory[i] / maxVal) * (h - 8) - 4;
+        const y = h - (speedHistory[i] / maxVal) * (h - 10) - 4;
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
 
-      ctx.strokeStyle = '#06b6d4';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       ctx.stroke();
 
-      // Area fill gradient
       ctx.lineTo(w, h);
       ctx.lineTo(0, h);
       const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, 'rgba(6, 182, 212, 0.25)');
-      grad.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+      grad.addColorStop(0, fillTop);
+      grad.addColorStop(1, fillBottom);
       ctx.fillStyle = grad;
       ctx.fill();
     }
 
-    // WebSocket connection
+    // WebSocket Live State
     function connectWs() {
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${protocol}//${location.host}/api/ws`;
@@ -847,9 +1614,9 @@
       let completedCount = 0;
 
       tasks.forEach(t => {
-        if (t.status === 'Downloading') {
-          totalSpeed += t.speed_bps;
-          activeConns += t.connections;
+        if (t.status === 'Downloading' || t.status === 'Muxing') {
+          totalSpeed += t.speed_bps || 0;
+          activeConns += t.connections || 0;
           activeCount++;
         } else if (t.status === 'Completed') {
           completedCount++;
@@ -864,7 +1631,6 @@
       document.getElementById('count-active').innerText = activeCount;
       document.getElementById('count-completed').innerText = completedCount;
 
-      // Update graph
       speedHistory.push(totalSpeed);
       speedHistory.shift();
       if (totalSpeed > peakSpeedVal) {
@@ -872,11 +1638,8 @@
         document.getElementById('peakSpeed').innerText = `Peak: ${formatSpeed(peakSpeedVal)}`;
       }
       drawSpeedGraph();
-
-      // Render tasks table
       renderTable();
 
-      // Update matrix modal if open
       if (selectedTaskId) {
         const task = tasks.find(t => t.id === selectedTaskId);
         if (task) renderMatrixModal(task);
@@ -884,111 +1647,151 @@
     }
 
     function renderTable() {
-      const tbody = document.getElementById('tasksTableBody');
+      const container = document.getElementById('tasksListContainer');
       const empty = document.getElementById('emptyState');
+      const searchQuery = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
 
-      let filtered = tasks;
+      let filtered = tasks.slice().reverse();
+
       if (currentFilter === 'downloading') {
-        filtered = tasks.filter(t => t.status === 'Downloading');
+        filtered = filtered.filter(t => t.status === 'Downloading' || t.status === 'Muxing');
       } else if (currentFilter === 'completed') {
-        filtered = tasks.filter(t => t.status === 'Completed');
+        filtered = filtered.filter(t => t.status === 'Completed');
+      } else if (['video', 'compressed', 'programs'].includes(currentFilter)) {
+        filtered = filtered.filter(t => getFileCategory(t.file_name) === currentFilter);
+      }
+
+      if (searchQuery) {
+        filtered = filtered.filter(t =>
+          (t.file_name || '').toLowerCase().includes(searchQuery) ||
+          (t.url || '').toLowerCase().includes(searchQuery)
+        );
       }
 
       if (filtered.length === 0) {
-        tbody.innerHTML = '';
+        container.style.display = 'none';
         empty.style.display = 'block';
         return;
       }
 
+      container.style.display = 'flex';
       empty.style.display = 'none';
-      tbody.innerHTML = filtered.map(t => {
+
+      container.innerHTML = filtered.map(t => {
         let badgeClass = 'badge-downloading';
+        let fillClass = '';
         let statusText = t.status;
-        if (t.status === 'Completed') badgeClass = 'badge-completed';
-        else if (t.status === 'Paused') badgeClass = 'badge-paused';
-        else if (t.status === 'Failed') badgeClass = 'badge-failed';
-        else if (t.status === 'Muxing') {
+
+        if (t.status === 'Completed') {
+          badgeClass = 'badge-completed';
+          fillClass = 'completed';
+        } else if (t.status === 'Paused') {
+          badgeClass = 'badge-paused';
+          fillClass = 'paused';
+        } else if (t.status === 'Failed') {
+          badgeClass = 'badge-failed';
+          fillClass = 'failed';
+        } else if (t.status === 'Muxing') {
           badgeClass = 'badge-downloading';
-          statusText = '⚡ Muxing Audio & Video...';
+          statusText = 'Merging Audio/Video';
         }
 
-        const qualityBadge = t.quality ? `<span class="badge" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9; margin-left: 6px; font-size: 10px;">${t.quality}</span>` : '';
+        const qualityBadge = t.quality ? `<span class="badge badge-quality">${t.quality}</span>` : '';
+        const sizeInfo = `${formatBytes(t.downloaded_bytes)} / ${t.total_size > 0 ? formatBytes(t.total_size) : '--'}`;
 
         return `
-          <tr>
-            <td>
-              <div class="file-cell" onclick="inspectMatrix('${t.id}')">
-                <div class="file-icon">📁</div>
-                <div class="file-info">
-                  <div>${t.file_name} ${qualityBadge}</div>
-                  <div class="file-url">${t.url}</div>
+          <div class="task-card">
+            <div class="file-cell" onclick="inspectMatrix('${t.id}')">
+              ${getFileIconMarkup(t.file_name)}
+              <div class="file-info">
+                <div class="file-title-row">
+                  <span class="file-name" title="${t.file_name}">${t.file_name}</span>
+                  ${qualityBadge}
+                </div>
+                <div class="file-meta-sub">
+                  <span class="file-size-mono">${sizeInfo}</span>
+                  <span>•</span>
+                  <span>${t.connections} threads</span>
                 </div>
               </div>
-            </td>
-            <td>
-              <div style="font-family: 'JetBrains Mono', monospace;">
-                ${formatBytes(t.downloaded_bytes)} / ${t.total_size > 0 ? formatBytes(t.total_size) : 'Unknown'}
-              </div>
-            </td>
-            <td style="min-width: 180px;">
-              <div class="progress-bar-wrap">
-                <div class="progress-bar-fill" style="width: ${t.progress_percent}%;"></div>
-              </div>
-              <div class="progress-stats">
-                <span>${t.progress_percent.toFixed(1)}%</span>
+            </div>
+
+            <div class="progress-col">
+              <div class="progress-top">
                 <span class="badge ${badgeClass}">${statusText}</span>
+                <span class="progress-pct">${t.progress_percent.toFixed(1)}%</span>
               </div>
-            </td>
-            <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #67e8f9;">
-              ${t.status === 'Downloading' ? formatSpeed(t.speed_bps) : '--'}
-            </td>
-            <td style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">
-              ${t.status === 'Downloading' ? formatEta(t.eta_seconds) : '--'}
-            </td>
-            <td>
-              <span class="badge" style="background: rgba(255,255,255,0.06);">${t.connections} threads</span>
-            </td>
-            <td>
-              ${t.status === 'Downloading' ? 
-                `<button class="action-btn" title="Pause" onclick="pauseTask('${t.id}')">⏸️</button>` : 
-                (t.status === 'Paused' || t.status === 'Failed' ? 
-                `<button class="action-btn" title="Resume" onclick="resumeTask('${t.id}')">▶️</button>` : '')
-              }
-              <button class="action-btn" title="Cancel/Delete" onclick="cancelTask('${t.id}')">🗑️</button>
-              <button class="action-btn" title="Inspect Dynamic Chunks" onclick="inspectMatrix('${t.id}')">🔍</button>
-            </td>
-          </tr>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill ${fillClass}" style="width: ${t.progress_percent}%;"></div>
+              </div>
+            </div>
+
+            <div class="speed-col">
+              <div class="speed-val">${t.status === 'Downloading' ? formatSpeed(t.speed_bps) : (t.status === 'Completed' ? 'Done' : '--')}</div>
+              <div class="eta-val">${t.status === 'Downloading' ? formatEta(t.eta_seconds) : ''}</div>
+            </div>
+
+            <div class="actions-col">
+              ${t.status === 'Downloading' ? `
+                <button class="action-btn" title="Pause Download" onclick="pauseTask('${t.id}')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="4" height="16" x="6" y="4" rx="1"/><rect width="4" height="16" x="14" y="4" rx="1"/></svg>
+                </button>
+              ` : (t.status === 'Paused' || t.status === 'Failed' ? `
+                <button class="action-btn" title="Resume Download" onclick="resumeTask('${t.id}')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </button>
+              ` : '')}
+              <button class="action-btn" title="Inspect Segments" onclick="inspectMatrix('${t.id}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+              </button>
+              <button class="action-btn danger" title="Remove Download" onclick="cancelTask('${t.id}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
         `;
       }).join('');
     }
 
-    // Task actions
+    // Task Actions
     async function pauseTask(id) {
       await fetch(`/api/tasks/${id}/pause`, { method: 'POST' });
+      showToast('Download paused');
     }
 
     async function resumeTask(id) {
       await fetch(`/api/tasks/${id}/resume`, { method: 'POST' });
+      showToast('Download resumed');
     }
 
     async function cancelTask(id) {
-      if (confirm('Delete this download?')) {
-        await fetch(`/api/tasks/${id}/cancel`, { method: 'POST' });
-      }
+      await fetch(`/api/tasks/${id}/cancel`, { method: 'POST' });
+      showToast('Download removed');
     }
 
-    function filterCategory(cat) {
+    function filterCategory(cat, el) {
       currentFilter = cat;
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      event.currentTarget.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      const titles = {
+        all: 'All Downloads',
+        downloading: 'Active Downloads',
+        completed: 'Completed Downloads',
+        video: 'Video & Audio',
+        compressed: 'Archives & Compressed',
+        programs: 'Programs & Installers'
+      };
+      document.getElementById('currentCategoryTitle').innerText = titles[cat] || 'All Downloads';
       renderTable();
     }
 
-    // Modal controls
+    // Modal Controls
     function openAddModal() {
       document.getElementById('addModal').style.display = 'flex';
       document.getElementById('downloadUrl').focus();
     }
+
     function closeAddModal() {
       document.getElementById('addModal').style.display = 'none';
     }
@@ -996,6 +1799,7 @@
     function openExtensionModal() {
       document.getElementById('extensionModal').style.display = 'flex';
     }
+
     function closeExtensionModal() {
       document.getElementById('extensionModal').style.display = 'none';
     }
@@ -1022,7 +1826,7 @@
           if (data.isVideo && data.qualities && data.qualities.length > 0) {
             wrap.style.display = 'block';
             document.getElementById('videoTitlePreview').innerText = data.title || '';
-            document.getElementById('videoMetaPreview').innerText = 
+            document.getElementById('videoMetaPreview').innerText =
               (data.author ? data.author + ' • ' : '') + (data.duration ? data.duration : '');
 
             const thumb = document.getElementById('videoThumb');
@@ -1034,7 +1838,7 @@
             }
 
             const sel = document.getElementById('videoQualitySelect');
-            sel.innerHTML = data.qualities.map(q => 
+            sel.innerHTML = data.qualities.map(q =>
               `<option value="${q.id}">${q.label} (${q.sizeFormatted})</option>`
             ).join('');
 
@@ -1060,7 +1864,10 @@
 
     async function submitDownload() {
       const url = document.getElementById('downloadUrl').value.trim();
-      if (!url) return alert('Please enter a valid URL');
+      if (!url) {
+        showToast('Please enter a valid download URL');
+        return;
+      }
 
       const customName = document.getElementById('customFilename').value.trim() || undefined;
       const connections = parseInt(document.getElementById('connectionsCount').value, 10);
@@ -1071,8 +1878,8 @@
         : undefined;
 
       const audioTrackEl = document.getElementById('audioLanguageSelect');
-      const audioTrack = (document.getElementById('videoPreviewWrap').style.display !== 'none' && 
-                          document.getElementById('audioLanguageWrap').style.display !== 'none' && 
+      const audioTrack = (document.getElementById('videoPreviewWrap').style.display !== 'none' &&
+                          document.getElementById('audioLanguageWrap').style.display !== 'none' &&
                           audioTrackEl)
         ? audioTrackEl.value
         : undefined;
@@ -1095,9 +1902,10 @@
       document.getElementById('videoPreviewWrap').style.display = 'none';
       document.getElementById('audioLanguageWrap').style.display = 'none';
       closeAddModal();
+      showToast('Download added to Downly queue');
     }
 
-    // Matrix modal
+    // Matrix Modal
     function inspectMatrix(id) {
       selectedTaskId = id;
       const task = tasks.find(t => t.id === id);
@@ -1114,15 +1922,15 @@
 
     function renderMatrixModal(task) {
       document.getElementById('matrixFilename').innerText = task.file_name;
-      document.getElementById('matrixDetails').innerText = 
-        `${task.segments.length} Dynamic Chunks | ${formatBytes(task.downloaded_bytes)} of ${formatBytes(task.total_size)} (${task.progress_percent.toFixed(1)}%)`;
+      document.getElementById('matrixDetails').innerText =
+        `${task.segments.length} Dynamic Segments • ${formatBytes(task.downloaded_bytes)} of ${formatBytes(task.total_size)} (${task.progress_percent.toFixed(1)}%)`;
 
       const bar = document.getElementById('matrixSegmentsBar');
       bar.innerHTML = task.segments.map(s => {
         const total = (s.end_byte - s.start_byte + 1) || 1;
         const pct = Math.min(100, (s.downloaded_bytes / total) * 100);
         return `
-          <div class="matrix-segment" title="Part ${s.id}: ${pct.toFixed(1)}%">
+          <div class="matrix-segment" title="Part ${s.id + 1}: ${pct.toFixed(1)}%">
             <div class="matrix-fill" style="width: ${pct}%;"></div>
           </div>
         `;
@@ -1134,20 +1942,21 @@
         const pct = total > 0 ? ((s.downloaded_bytes / total) * 100).toFixed(1) : 0;
         return `
           <tr>
-            <td>Part #${s.id + 1}</td>
-            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">${s.start_byte} - ${s.end_byte}</td>
-            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">${formatBytes(s.downloaded_bytes)}</td>
-            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">${pct}%</td>
+            <td style="font-weight: 600; color: var(--text-primary);">Part #${s.id + 1}</td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">${s.start_byte} – ${s.end_byte}</td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">${formatBytes(s.downloaded_bytes)}</td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">${pct}%</td>
             <td><span class="badge ${s.status === 'Completed' ? 'badge-completed' : 'badge-downloading'}">${s.status}</span></td>
           </tr>
         `;
       }).join('');
     }
 
+    window.addEventListener('resize', drawSpeedGraph);
     window.onload = () => {
       connectWs();
+      drawSpeedGraph();
     };
   </script>
 </body>
 </html>
-

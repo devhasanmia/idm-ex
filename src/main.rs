@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         "download" | "d" => {
             if args.len() < 3 {
                 eprintln!("Error: Missing URL for download command.");
-                eprintln!("Usage: idm-rs download <URL> [-n connections] [-o output] [--speed-limit bytes_per_sec]");
+                eprintln!("Usage: downly download <URL> [-n connections] [-o output] [--speed-limit bytes_per_sec]");
                 std::process::exit(1);
             }
             let url = args[2].clone();
@@ -117,13 +117,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
 fn print_help() {
     println!(r#"
-⚡ IDM-RS: Ultra-Fast Dynamic Multi-Segment Internet Download Manager in Rust
+⚡ Downly: Ultra-Fast Dynamic Multi-Segment Internet Download Manager in Rust
 
 USAGE:
-    idm-rs                                  Start Web Dashboard GUI & open browser
-    idm-rs download <URL> [OPTIONS]         High-speed accelerated CLI download
-    idm-rs serve [OPTIONS]                  Run background engine server
-    idm-rs <URL>                            Quick download with default 16 connections
+    downly                                  Start Web Dashboard GUI & open browser
+    downly download <URL> [OPTIONS]         High-speed accelerated CLI download
+    downly serve [OPTIONS]                  Run background engine server
+    downly <URL>                            Quick download with default 16 connections
 
 OPTIONS for 'download':
     -n, --connections <N>      Number of parallel connection threads (default: 16)
@@ -167,7 +167,7 @@ async fn run_cli_download(
         (default_dir, None)
     };
 
-    println!("⚡ IDM-RS: Initializing multi-part turbo download...");
+    println!("⚡ Downly: Initializing multi-part turbo download...");
     println!("🔗 URL: {}", url);
     println!("🚀 Threads: {}", connections);
 
